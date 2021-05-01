@@ -1,0 +1,10 @@
+ 
+Compiling and linking the model (Visual C++). 
+ 
+ 
+Environment variable MSVCDir does not point to the VC++ installation directory. 
+MSVCDir is C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build. 
+ 
+ 
+Error generating Dymosim. 
+ 
