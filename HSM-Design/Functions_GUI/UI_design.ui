@@ -1,0 +1,994 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>675</width>
+    <height>548</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>300</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Dimensionierung Wärmepumensystem</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="minimumSize">
+    <size>
+     <width>600</width>
+     <height>300</height>
+    </size>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>Angaben zur Berechnung</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="1" column="4">
+         <widget class="QLabel" name="label_44">
+          <property name="text">
+           <string>Angaben zum Wetter:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="heizlast_check">
+          <property name="text">
+           <string>Heizlast (Teaser)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="10">
+         <widget class="QTextBrowser" name="beschreibung">
+          <property name="html">
+           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Die ist ein Tool zum Berechnen einiger Gebäudedaten. Zur Auswahl stehen die Heizlast und die Berechnungen der Dimensionierung eines Wärmepumpensystems nach DIN- oder VDI-Norm.&lt;br /&gt;&lt;br /&gt;Zur Bestimmung der Berechnungen nach Norm werden die Eingaben aus dem Tab &amp;quot;Gebäudedaten&amp;quot; benötigt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QCheckBox" name="vdi_check">
+          <property name="text">
+           <string>VDI-Norm</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="din_check">
+          <property name="text">
+           <string>DIN-Norm</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="7" rowspan="4">
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QRadioButton" name="try_radio">
+          <property name="text">
+           <string>TRY</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="4">
+         <widget class="QRadioButton" name="indtemp_radio">
+          <property name="text">
+           <string>Individuelle Temperatur</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" rowspan="4">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="4">
+         <widget class="QCheckBox" name="vdiauslegung_check">
+          <property name="text">
+           <string>VDI-Auslegung</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QCheckBox" name="cop_check">
+          <property name="text">
+           <string>SCOP nach Norm</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="4">
+         <widget class="QLabel" name="label_45">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QCheckBox" name="jahres_check">
+          <property name="text">
+           <string>Jahressimulation</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="4">
+         <widget class="QCheckBox" name="dinauslegung_check">
+          <property name="text">
+           <string>DIN-Auslegung</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="4">
+         <widget class="QCheckBox" name="vdiauslegungcop_check">
+          <property name="text">
+           <string>VDI-Auslegung</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="4">
+         <widget class="QCheckBox" name="dinauslegungcop_check">
+          <property name="text">
+           <string>DIN-Auslegung</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="4">
+         <widget class="QCheckBox" name="indauslegung_check">
+          <property name="text">
+           <string>individuelle Auslegung</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="4">
+         <widget class="QCheckBox" name="indauslegungcop_check">
+          <property name="text">
+           <string>individuelle Auslegung</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="3" rowspan="3">
+         <widget class="Line" name="line_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="3" rowspan="3">
+         <widget class="Line" name="line_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="8">
+         <widget class="QLineEdit" name="powerhp_edit"/>
+        </item>
+        <item row="8" column="9">
+         <widget class="QLineEdit" name="powerhr_edit"/>
+        </item>
+        <item row="3" column="9">
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="9" column="8">
+         <widget class="QLabel" name="label_ww">
+          <property name="text">
+           <string>Warmwasserspeicher in l</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="9">
+         <widget class="QLineEdit" name="volumedhw_edit"/>
+        </item>
+        <item row="9" column="9">
+         <widget class="QLabel" name="label_dhw">
+          <property name="text">
+           <string>Trinkwarmwasserspeicher in  l</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="8">
+         <widget class="QLineEdit" name="volumeww_edit"/>
+        </item>
+        <item row="7" column="8">
+         <widget class="QLabel" name="label_php">
+          <property name="text">
+           <string>Leistung der Wärmepumpe in kW</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="9">
+         <widget class="QLabel" name="label_phr">
+          <property name="text">
+           <string>Leistung des Heizstabes in kW</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="7" rowspan="6">
+         <widget class="Line" name="line_6">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="8">
+         <widget class="QLineEdit" name="heiztemp_edit">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose a constant ambient temperature, for which the heat demand is calculated. If no value is chosen, a default value of -12°C is takenn&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="8" rowspan="2">
+         <widget class="QLabel" name="label_43">
+          <property name="text">
+           <string>Gewünschte Umgebungstemperatur in °C:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Heizlast</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0" colspan="3">
+         <widget class="QLabel" name="label_40">
+          <property name="text">
+           <string>Angabe der Heizlast durch:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QRadioButton" name="teaser_radio">
+          <property name="text">
+           <string>Teaser</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="2">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="2">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="2">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" rowspan="4" colspan="3">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Gebäudedaten</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_5">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Baujahr</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>m</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Stockwerke</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="5">
+            <widget class="QComboBox" name="kreis_combo">
+             <property name="minimumSize">
+              <size>
+               <width>125</width>
+               <height>19</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Bundesland</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="4">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Kreis</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="nutzflaeche_edit"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>Nutzungsart</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="nutzungsart_combo">
+             <item>
+              <property name="text">
+               <string>Einfamilienhaus</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mehrfamilienhaus</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Reihenhaus</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Wohnblock</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Institut4</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Nutzfläche</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Raumhöhe</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="stockwerke_edit"/>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="raumhoehe_edit"/>
+           </item>
+           <item row="4" column="2">
+            <widget class="QLabel" name="label_20">
+             <property name="maximumSize">
+              <size>
+               <width>20</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>m²</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="baujahr_edit"/>
+           </item>
+           <item row="0" column="3" rowspan="5">
+            <widget class="Line" name="line">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="5">
+            <widget class="QComboBox" name="bundesland_combo">
+             <property name="minimumSize">
+              <size>
+               <width>125</width>
+               <height>19</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>Baden Württemberg</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Bayern</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Berlin</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Brandenburg</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Bremen</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Hamburg</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Hessen</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mecklenburg Vorpommern</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Niedersachsen</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Nordrhein Westfalen</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Rheinland Pfalz</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Saarland</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Sachsen</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Sachsen Anhalt</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Schleswig Holstein</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Thüringen</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QCheckBox" name="modernisiert_check">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ist das Gebäude modernisiert?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Modernisiert</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QCheckBox" name="lueftung_check">
+             <property name="text">
+              <string>Lüftungsgerät</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QGridLayout" name="gridLayout_6">
+           <item row="0" column="3">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="heizlast_edit"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_41">
+             <property name="text">
+              <string>Heizlast bei Normaußentemperatur</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="label_42">
+             <property name="text">
+              <string>in kW</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <spacer name="verticalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0">
+         <widget class="QRadioButton" name="heizlast_radio">
+          <property name="text">
+           <string>Individuell</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Gemeinsame Daten</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_26">
+          <property name="text">
+           <string>Zapfprofil</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="zapf_combo">
+          <item>
+           <property name="text">
+            <string>Einzelperson</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Familie mit Duschen</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Familie mit Duschen und Baden</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QToolButton" name="tool_button">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_25">
+          <property name="text">
+           <string>Bivalenztemperatur</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="bivalenztemp_edit"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_27">
+          <property name="text">
+           <string>Temperatur des kalten Wassers</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="tempkalt_edit"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_29">
+          <property name="text">
+           <string>Temperatursollwert im Pufferspeicher</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="tempSpeicher_edit"/>
+        </item>
+        <item row="5" column="0">
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0">
+         <widget class="QRadioButton" name="monovalent_radio">
+          <property name="text">
+           <string>Monovalent</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QRadioButton" name="bivalent_radio">
+          <property name="text">
+           <string>Bivalent</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="label_21">
+          <property name="maximumSize">
+           <size>
+            <width>1600</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>°C</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="label_24">
+          <property name="maximumSize">
+           <size>
+            <width>1600</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>°C</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QLabel" name="label_28">
+          <property name="maximumSize">
+           <size>
+            <width>1600</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>°C</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>DIN-Norm</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Auslegung Warmwasserspeicher</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLineEdit" name="auslegungWSP_edit"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Auslegungsfaktor Heizlast</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Auslegungsfaktor Warmwasser</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QLineEdit" name="auslegungsfakWW_edit"/>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLineEdit" name="auslegungsfakHL_edit"/>
+        </item>
+        <item row="0" column="4">
+         <widget class="QLabel" name="label_30">
+          <property name="text">
+           <string>l/kW</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QLabel" name="label_31">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QLabel" name="label_32">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>VDI-Norm</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="7" column="0">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_22">
+          <property name="text">
+           <string>Wärmebedarf sonstiger Verbraucher (24h)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QLineEdit" name="sonstigerbedarf_edit"/>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Heizgrenztemperatur</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>Rücklauftemperatur der Zirkulationsleitung</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLineEdit" name="zirkRLtemp_edit"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Aufschlag durch Durchmischungsverluste im Speicher</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_23">
+          <property name="text">
+           <string>Sperrdauer</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2">
+         <widget class="QLineEdit" name="sperrdauer_edit"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>Anzahl Nutzungseinheiten</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLineEdit" name="nutzungseinheiten_edit"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_18">
+          <property name="text">
+           <string>Zirkulationsverluste</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLineEdit" name="zirkverl_edit"/>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLineEdit" name="aufschlagdurch_edit"/>
+        </item>
+        <item row="6" column="2">
+         <widget class="QLineEdit" name="heizgrenz_edit"/>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="label_33">
+          <property name="text">
+           <string>kWh/24h</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLabel" name="label_34">
+          <property name="text">
+           <string>°C</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QLabel" name="label_35">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QLabel" name="label_36">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3">
+         <widget class="QLabel" name="label_37">
+          <property name="text">
+           <string>kWh</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="3">
+         <widget class="QLabel" name="label_38">
+          <property name="text">
+           <string>h</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="3">
+         <widget class="QLabel" name="label_39">
+          <property name="text">
+           <string>°C</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="start_button">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Startet die Berechnung der ausgewählten Gebäudedaten&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
