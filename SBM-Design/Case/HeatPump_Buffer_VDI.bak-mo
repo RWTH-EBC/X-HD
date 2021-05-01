@@ -1,0 +1,4 @@
+within Configurations.Case;
+model HeatPump_Buffer_VDI
+  extends HeatPumpandStorage_prototype;
+end HeatPump_Buffer_VDI;

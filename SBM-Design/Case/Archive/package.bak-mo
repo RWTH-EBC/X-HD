@@ -1,0 +1,4 @@
+within Configurations.Case;
+package Archive
+extends Modelica.Icons.Package;
+end Archive;

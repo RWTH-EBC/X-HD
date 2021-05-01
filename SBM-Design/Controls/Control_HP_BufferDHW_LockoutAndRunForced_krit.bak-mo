@@ -1,0 +1,217 @@
+within Configurations.Controls;
+model Control_HP_BufferDHW_LockoutAndRunForced_krit
+  parameter Modelica.SIunits.TemperatureDifference StorageHysteresis = 10;
+  parameter Real T_Set_Buffer_control = 323.15 "K";
+  parameter Real T_Set_DHW_control = 323.15 "K";
+  parameter Real T_Max_Storage_Buffer = 333.15 "K";
+  parameter Real T_Min_Storage_Buffer = 313.15 "K";
+   parameter Real T_Max_Storage_DHW = 333.15 "K";
+  parameter Real T_Min_Storage_DHW = 313.15 "K";
+  parameter Real Hyst_T_Buffer = T_Max_Storage_Buffer-T_Min_Storage_Buffer "K";
+  parameter Real Hyst_T_DHW = T_Max_Storage_DHW-T_Min_Storage_DHW "K";
+
+  parameter Modelica.SIunits.Time LockoutTime=0;
+  parameter Modelica.SIunits.Time MinRunTime=0;
+
+  Modelica.Blocks.Interfaces.RealInput T_Top_Buffer annotation (Placement(
+        transformation(extent={{-140,-140},{-100,-100}}),iconTransformation(
+          extent={{-140,-140},{-100,-100}})));
+
+  Modelica.Blocks.MathBoolean.OnDelay fallingEdgeHP(delayTime=0)
+    annotation (Placement(transformation(extent={{-42,16},{-34,24}})));
+  Modelica.Blocks.Logical.Not fallingEdgeNeg
+    annotation (Placement(transformation(extent={{-28,16},{-20,24}})));
+  Modelica.Blocks.Discrete.TriggeredMax sampleTimeMinPause
+    annotation (Placement(transformation(extent={{-22,30},{-14,38}})));
+  Modelica.Blocks.Sources.RealExpression currentTime(y=time)
+    annotation (Placement(transformation(extent={{-108,56},{-96,68}})));
+  Modelica.Blocks.Math.Feedback deltaTimeMinPause
+    annotation (Placement(transformation(extent={{-12,42},{-4,50}})));
+  Modelica.Blocks.Logical.Pre pre1
+    annotation (Placement(transformation(extent={{-88,82},{-80,90}})));
+  Modelica.Blocks.Logical.GreaterEqualThreshold greaterEqualThreshold(threshold=
+       LockoutTime)
+    annotation (Placement(transformation(extent={{2,42},{10,50}})));
+  Modelica.Blocks.MathBoolean.OnDelay risingEdgeHP(delayTime=0)
+    annotation (Placement(transformation(extent={{-42,80},{-34,88}})));
+  Modelica.Blocks.Discrete.TriggeredMax sampleTimeMinRun
+    annotation (Placement(transformation(extent={{-24,74},{-16,82}})));
+  Modelica.Blocks.Math.Feedback deltaTimeMinRun
+    annotation (Placement(transformation(extent={{-16,90},{-8,98}})));
+  Modelica.Blocks.Logical.LessEqualThreshold lessEqualThreshold(threshold=
+        MinRunTime)
+    annotation (Placement(transformation(extent={{-2,90},{6,98}})));
+  Modelica.Blocks.Logical.Or HPactive annotation (Placement(transformation(
+        extent={{-7,-7},{7,7}},
+        rotation=90,
+        origin={125,99})));
+  Modelica.Blocks.Interfaces.BooleanOutput HP_Buffer_OnOff
+    "Connector of Boolean output signal"
+    annotation (Placement(transformation(extent={{160,-120},{180,-100}}),
+        iconTransformation(extent={{160,-120},{180,-100}})));
+  Modelica.Blocks.Interfaces.RealInput T_Top_DHW annotation (Placement(
+        transformation(extent={{-140,80},{-100,120}}),  iconTransformation(
+          extent={{-140,60},{-100,100}})));
+  Modelica.Blocks.Logical.And DemandAndNoPauseDHW
+    annotation (Placement(transformation(extent={{50,-10},{62,2}})));
+  Modelica.Blocks.Interfaces.BooleanOutput HP_DHW_OnOff
+    "Connector of Boolean output signal"
+    annotation (Placement(transformation(extent={{160,60},{180,80}}),
+        iconTransformation(extent={{160,60},{180,80}})));
+  Modelica.Blocks.Logical.And DemandAndNoPauseBuffer
+    annotation (Placement(transformation(extent={{52,-100},{64,-88}})));
+  ChooseHp chooseHp(
+    T_Min_Buffer=T_Min_Storage_Buffer,
+    T_Max_Buffer=T_Max_Storage_Buffer,
+    T_Min_DHW=T_Min_Storage_DHW,
+    T_Max_DHW=T_Max_Storage_DHW,
+    T_Set_DHW=T_Set_DHW_control,
+    T_Set_Buffer=T_Set_Buffer_control,
+    Hysteresis_DHW=Hyst_T_Buffer,
+    Hysteresis_Buffer=Hyst_T_DHW)
+    annotation (Placement(transformation(extent={{72,-46},{104,-14}})));
+  Hysteresis_control hysteresis_control_DHW(T_Min=T_Min_Storage_DHW, T_Max=
+        T_Max_Storage_DHW)
+    annotation (Placement(transformation(extent={{-104,-52},{-56,-30}})));
+  Hysteresis_control hysteresis_control_Buffer(T_Min=T_Min_Storage_Buffer,
+      T_Max=T_Max_Storage_Buffer)
+    annotation (Placement(transformation(extent={{-100,-98},{-54,-74}})));
+equation
+  connect(sampleTimeMinPause.y, deltaTimeMinPause.u2) annotation (Line(points={{-13.6,
+          34},{-8,34},{-8,42.8}},                 color={0,0,127}));
+  connect(fallingEdgeHP.y, fallingEdgeNeg.u) annotation (Line(points={{-33.2,20},
+          {-33.2,20},{-28.8,20}}, color={255,0,255}));
+  connect(fallingEdgeNeg.y, sampleTimeMinPause.trigger) annotation (Line(points={{-19.6,
+          20},{-19.6,20},{-18,20},{-18,29.28}},          color={255,0,255}));
+  connect(deltaTimeMinPause.u1, currentTime.y) annotation (Line(points={{-11.2,46},
+          {-12,46},{-50,46},{-50,62},{-95.4,62}},
+                                  color={0,0,127}));
+  connect(greaterEqualThreshold.u, deltaTimeMinPause.y) annotation (Line(points={{1.2,46},
+          {1.2,46},{-4.4,46}},              color={0,0,127}));
+  connect(risingEdgeHP.u, pre1.y) annotation (Line(points={{-43.6,84},{-54,84},{
+          -54,86},{-79.6,86}},    color={255,0,255}));
+  connect(risingEdgeHP.y, sampleTimeMinRun.trigger) annotation (Line(points={{-33.2,
+          84},{-30,84},{-30,72},{-20,72},{-20,73.28}},    color={255,0,255}));
+  connect(sampleTimeMinRun.y, deltaTimeMinRun.u2)
+    annotation (Line(points={{-15.6,78},{-12,78},{-12,90.8}},
+                                                            color={0,0,127}));
+  connect(sampleTimeMinRun.u, currentTime.y) annotation (Line(points={{-24.8,78},
+          {-24.8,86},{-24,86},{-24,62},{-95.4,62}},  color={0,0,127}));
+  connect(deltaTimeMinRun.u1, currentTime.y) annotation (Line(points={{-15.2,94},
+          {-42,94},{-42,62},{-95.4,62}},              color={0,0,127}));
+  connect(deltaTimeMinRun.y, lessEqualThreshold.u)
+    annotation (Line(points={{-8.4,94},{-8.4,94},{-2.8,94}}, color={0,0,127}));
+  connect(sampleTimeMinPause.u, currentTime.y) annotation (Line(points={{-22.8,34},
+          {-50,34},{-50,62},{-95.4,62}},    color={0,0,127}));
+  connect(DemandAndNoPauseDHW.u1, greaterEqualThreshold.y) annotation (Line(
+        points={{48.8,-4},{28,-4},{28,46},{10.4,46}}, color={255,0,255}));
+  connect(HPactive.y, pre1.u) annotation (Line(points={{125,106.7},{126,106.7},{
+          126,104},{126,114},{-88,114},{-88,86},{-88.8,86}}, color={255,0,255}));
+  connect(pre1.y, fallingEdgeHP.u) annotation (Line(points={{-79.6,86},{-60,86},
+          {-60,20},{-43.6,20}}, color={255,0,255}));
+  connect(DemandAndNoPauseBuffer.u1, greaterEqualThreshold.y) annotation (Line(
+        points={{50.8,-94},{28,-94},{28,46},{10.4,46}}, color={255,0,255}));
+  connect(chooseHp.DHW_OnOff, HP_DHW_OnOff) annotation (Line(points={{105.6,-21.68},
+          {130,-21.68},{130,-22},{154,-22},{154,70},{170,70}}, color={255,0,255}));
+  connect(chooseHp.Buffer_OnOff, HP_Buffer_OnOff) annotation (Line(points={{105.6,
+          -38},{134,-38},{134,-110},{170,-110}}, color={255,0,255}));
+  connect(chooseHp.DemandBuffer, DemandAndNoPauseBuffer.y) annotation (Line(
+        points={{68.8,-41.2},{68.8,-67.6},{64.6,-67.6},{64.6,-94}}, color={255,0,
+          255}));
+  connect(chooseHp.T_Top_Buffer, T_Top_Buffer) annotation (Line(points={{68.8,-33.2},
+          {-19.6,-33.2},{-19.6,-120},{-120,-120}}, color={0,0,127}));
+  connect(chooseHp.DemandDHW, DemandAndNoPauseDHW.y) annotation (Line(points={{68.8,
+          -25.2},{66,-25.2},{66,-26},{64,-26},{64,-4},{62.6,-4}}, color={255,0,255}));
+  connect(chooseHp.T_Top_DHW, T_Top_DHW) annotation (Line(points={{68.8,-17.2},{
+          12,-17.2},{12,-24},{-64,-24},{-64,100},{-120,100}}, color={0,0,127}));
+  connect(chooseHp.RunForced, lessEqualThreshold.y) annotation (Line(points={{88,
+          -10.8},{88,-6},{86,-6},{86,94},{6.4,94}}, color={255,0,255}));
+  connect(HPactive.u2, chooseHp.Buffer_OnOff) annotation (Line(points={{130.6,
+          90.6},{130.6,-38},{124,-38},{106,-38},{105.6,-38}},     color={255,0,255}));
+  connect(HPactive.u1, chooseHp.DHW_OnOff) annotation (Line(points={{125,90.6},
+          {125,-16},{124,-16},{124,-21.68},{105.6,-21.68}},          color={255,
+          0,255}));
+  connect(T_Top_Buffer, hysteresis_control_Buffer.T_Top) annotation (Line(
+        points={{-120,-120},{-112,-120},{-112,-74},{-101.84,-74}}, color={0,0,127}));
+  connect(hysteresis_control_Buffer.WP_an, DemandAndNoPauseBuffer.u2)
+    annotation (Line(points={{-50.78,-86},{0,-86},{0,-98.8},{50.8,-98.8}},
+        color={255,0,255}));
+  connect(hysteresis_control_DHW.WP_an, DemandAndNoPauseDHW.u2) annotation (
+      Line(points={{-52.64,-41},{-2.32,-41},{-2.32,-8.8},{48.8,-8.8}}, color={255,
+          0,255}));
+  connect(T_Top_DHW, hysteresis_control_DHW.T_Top) annotation (Line(points={{-120,
+          100},{-114,100},{-114,-30},{-105.92,-30}}, color={0,0,127}));
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-120,-160},
+            {160,120}}),                                        graphics={
+        Rectangle(
+          extent={{160,120},{-120,-160}},
+          lineColor={0,0,0},
+          lineThickness=0.5,
+          fillColor={175,175,175},
+          fillPattern=FillPattern.Solid),
+        Text(
+          extent={{12,110},{138,14}},
+          lineColor={217,67,180},
+          pattern=LinePattern.Dash,
+          lineThickness=0.5,
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid,
+          textString="HP_DHW_OnOff"),
+        Text(
+          extent={{22,-56},{148,-152}},
+          lineColor={217,67,180},
+          pattern=LinePattern.Dash,
+          lineThickness=0.5,
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid,
+          textString="HP_Buffer_OnOff"),
+        Text(
+          extent={{-90,114},{-24,46}},
+          lineColor={238,46,47},
+          pattern=LinePattern.Dash,
+          lineThickness=0.5,
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid,
+          textString="T_DHW"),
+        Text(
+          extent={{-92,-82},{-26,-150}},
+          lineColor={238,46,47},
+          pattern=LinePattern.Dash,
+          lineThickness=0.5,
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid,
+          textString="T_Buffer"),
+        Text(
+          extent={{-78,18},{122,-54}},
+          lineColor={0,0,0},
+          pattern=LinePattern.Dash,
+          lineThickness=0.5,
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid,
+          textString="HP Control")}),                            Diagram(
+        coordinateSystem(preserveAspectRatio=false, extent={{-120,-160},{160,120}}),
+                                                     graphics={
+        Rectangle(
+          extent={{-54,12},{18,52}},
+          lineColor={28,108,200},
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid),
+        Rectangle(
+          extent={{-54,70},{18,106}},
+          lineColor={28,108,200},
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid),
+        Text(
+          extent={{-16,20},{2,12}},
+          lineColor={28,108,200},
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid,
+          textString="Lockout"),
+        Text(
+          extent={{-24,106},{-2,94}},
+          lineColor={28,108,200},
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid,
+          textString="RunForced
+")}));
+end Control_HP_BufferDHW_LockoutAndRunForced_krit;

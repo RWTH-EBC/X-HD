@@ -1,0 +1,5 @@
+within Configurations.Case;
+model HeatPump_DHW_Buffer_DIN
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+        coordinateSystem(preserveAspectRatio=false)));
+end HeatPump_DHW_Buffer_DIN;

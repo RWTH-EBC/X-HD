@@ -1,0 +1,46 @@
+within Configurations.Case;
+model HP_Buffer_DHW_DIN_Parallel_newcontrol2
+  Controls.Control_HP_BufferDHW_v2_krit control_HP_BufferDHW_v2_krit
+    annotation (Placement(transformation(extent={{-96,-6},{-52,18}})));
+  HeatPump_DHW_DIN_newcontrol2 heatPump_DHW_DIN_newcontrol2_1
+    annotation (Placement(transformation(extent={{-8,14},{74,88}})));
+  HeatPump_Buffer_DIN_newcontrol2 heatPump_Buffer_DIN_newcontrol2_1
+    annotation (Placement(transformation(extent={{-34,-78},{38,-8}})));
+  Configurations_Katha.DataBase.Tamb_TRYAachen_2a T_amb
+    annotation (Placement(transformation(extent={{-94,-62},{-82,-50}})));
+equation
+  connect(control_HP_BufferDHW_v2_krit.HR_DHW_OnOff,
+    heatPump_DHW_DIN_newcontrol2_1.HR_onoff) annotation (Line(points={{-50.1667,
+          10},{-32,10},{-32,74.31},{-9.23,74.31}}, color={255,0,255}));
+  connect(control_HP_BufferDHW_v2_krit.HP_DHW_OnOff,
+    heatPump_DHW_DIN_newcontrol2_1.HeatPump_DHW_on) annotation (Line(points={{
+          -50.1667,15},{-32.0833,15},{-32.0833,35.83},{-9.23,35.83}}, color={
+          255,0,255}));
+  connect(control_HP_BufferDHW_v2_krit.HP_Buffer_OnOff,
+    heatPump_Buffer_DIN_newcontrol2_1.HeatPump_Buffer_on) annotation (Line(
+        points={{-50.1667,2},{-46,2},{-46,-57.7},{-35.44,-57.7}}, color={255,0,
+          255}));
+  connect(control_HP_BufferDHW_v2_krit.HR_Buffer_OnOff,
+    heatPump_Buffer_DIN_newcontrol2_1.HR_onoff) annotation (Line(points={{
+          -50.1667,-3},{-50.1667,-12.5},{-35.08,-12.5},{-35.08,-20.95}}, color=
+          {255,0,255}));
+  connect(T_amb.y, heatPump_Buffer_DIN_newcontrol2_1.T_amb) annotation (Line(
+        points={{-81.4,-56},{-60,-56},{-60,-75.2},{-37.6,-75.2}}, color={0,0,
+          127}));
+  connect(T_amb.y, control_HP_BufferDHW_v2_krit.T_amb1) annotation (Line(points=
+         {{-81.4,-56},{-78,-56},{-78,-5.2},{-74,-5.2}}, color={0,0,127}));
+  connect(T_amb.y, heatPump_DHW_DIN_newcontrol2_1.T_amb) annotation (Line(
+        points={{-81.4,-56},{-50,-56},{-50,16.96},{-12.1,16.96}}, color={0,0,
+          127}));
+  connect(heatPump_DHW_DIN_newcontrol2_1.T_Top_DHW,
+    control_HP_BufferDHW_v2_krit.T_Top_DHW) annotation (Line(points={{76.46,
+          70.98},{-116.77,70.98},{-116.77,14},{-96,14}}, color={0,0,127}));
+  connect(heatPump_Buffer_DIN_newcontrol2_1.T_Bottom_Buffer,
+    control_HP_BufferDHW_v2_krit.T_Bottom_Buffer) annotation (Line(points={{
+          40.16,-35.3},{-110.92,-35.3},{-110.92,-5},{-96,-5}}, color={0,0,127}));
+  connect(heatPump_Buffer_DIN_newcontrol2_1.T_Top_Buffer,
+    control_HP_BufferDHW_v2_krit.T_Top_Buffer) annotation (Line(points={{40.16,
+          -24.8},{-120.92,-24.8},{-120.92,2},{-96,2}}, color={0,0,127}));
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+        coordinateSystem(preserveAspectRatio=false)));
+end HP_Buffer_DHW_DIN_Parallel_newcontrol2;

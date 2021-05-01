@@ -1,0 +1,261 @@
+within Configurations.Case;
+model HeatPump_DHW_DIN_newcontrol
+  parameter Real T_Min_hysteresis_DHW = 313.15 "K";
+
+  AixLib.Fluid.Storage.BufferStorage bufferStorage(
+    useHeatingCoil2=false,
+    useHeatingRod=false,
+    redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,
+    redeclare package MediumHC1 =
+        Modelica.Media.Water.ConstantPropertyLiquidWater,
+    redeclare package MediumHC2 =
+        Modelica.Media.Water.ConstantPropertyLiquidWater,
+    useHeatingCoil1=true,
+    alphaHC1=300,
+    data=AixLib.DataBase.Storage.Generic_New_2000l(
+        hTank=0.7911,
+        hUpperPorts=0.7461,
+        hHC1Up=0.6911,
+        hHC1Low=0.1,
+        hHR=0.5,
+        dTank=0.402,
+        hTS2=0.7461),
+    TStart=318.15)
+    annotation (Placement(transformation(extent={{10,-18},{30,8}})));
+  AixLib.Fluid.Movers.FlowControlled_dp pumpHP(
+    inputType=AixLib.Fluid.Types.InputType.Continuous,
+    redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,
+    addPowerToMedium=false,
+    nominalValuesDefineDefaultPressureCurve=true,
+    redeclare AixLib.Fluid.Movers.Data.Pumps.Wilo.VeroLine50slash150dash4slash2
+      per,
+    dp_nominal=control_Pump.dp_max_HP,
+    m_flow_nominal=0.351,
+    T_start=318.15)
+    annotation (Placement(transformation(extent={{-36,-66},{-56,-46}})));
+  AixLib.Fluid.Movers.FlowControlled_dp pumpDHW(
+    redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,
+    inputType=AixLib.Fluid.Types.InputType.Continuous,
+    addPowerToMedium=false,
+    nominalValuesDefineDefaultPressureCurve=true,
+    m_flow_nominal=control_Pump.m_flow_pump_max,
+    dp_nominal=dHW.dp_DHW,
+    redeclare AixLib.Fluid.Movers.Data.Pumps.Wilo.TopS25slash10 per,
+    T_start=318.15)
+    annotation (Placement(transformation(extent={{60,-44},{44,-28}})));
+  AixLib.Fluid.Sources.FixedBoundary bou2(
+    redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,
+    nPorts=1,
+    p=300000)
+    annotation (Placement(transformation(extent={{76,26},{64,38}})));
+
+  AixLib.Fluid.Sources.FixedBoundary bou1(
+    nPorts=1,
+    redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,
+    p=200000)
+    annotation (Placement(transformation(extent={{26,-64},{12,-50}})));
+
+  AixLib.Fluid.Sources.MassFlowSource_T m_flow_freshW(
+    m_flow=0.09167,
+    use_m_flow_in=true,
+    nPorts=1,
+    redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,
+    T=283.15)
+    annotation (Placement(transformation(extent={{7,-7},{-7,7}},
+        rotation=90,
+        origin={67,-3})));
+
+  AixLib.Fluid.HeatExchangers.HeaterCooler_u HeatingRod(
+    m_flow_nominal=pumpHP.m_flow_nominal,
+    redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,
+    Q_flow_nominal=6641.61,
+    dp_nominal=25000)
+    annotation (Placement(transformation(extent={{-52,36},{-32,56}})));
+  Controls.Control_Pump control_Pump(
+    m_flow_pump_max=0.141,
+    dp_max_HP=163281.2027,
+    dp_max_demand=dHW.dp_DHW)
+    annotation (Placement(transformation(extent={{58,80},{74,94}})));
+  Buildings.DHW dHW(m_flow_DHW=control_Pump.m_flow_pump_max, dp_DHW=100000)
+    annotation (Placement(transformation(extent={{42,52},{62,72}})));
+  HeatPumpandStorages.HeatPump_Carnot_DIN heatPump_Carnot_DIN(
+                 m_flow_HP=pumpHP.m_flow_nominal,
+    Q_flow_Biv=8248.21,
+    T_Biv=271.15)
+                 annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=90,
+        origin={-66,-2})));
+  Modelica.Blocks.Interfaces.RealOutput Q_flow_HP_DHW
+    annotation (Placement(transformation(extent={{94,-30},{114,-10}})));
+  Modelica.Blocks.Interfaces.RealOutput Q_flow_HeatingRod_DHW
+    annotation (Placement(transformation(extent={{94,10},{114,30}})));
+  General.Carnot_calc carnot_calc
+    annotation (Placement(transformation(extent={{-42,-94},{-16,-80}})));
+  AixLib.Fluid.Sensors.Temperature senTem_supply_HP(redeclare package Medium =
+        Modelica.Media.Water.ConstantPropertyLiquidWater)
+    annotation (Placement(transformation(extent={{-98,30},{-84,46}})));
+  Modelica.Blocks.Logical.GreaterThreshold greaterThreshold
+    annotation (Placement(transformation(extent={{-78,-64},{-68,-54}})));
+  Modelica.Blocks.Interfaces.RealOutput COP_carnot_DHW
+    annotation (Placement(transformation(extent={{96,-90},{116,-70}})));
+  DataBase.Tamb_TRYAachen_2a T_amb
+    annotation (Placement(transformation(extent={{-76,-96},{-64,-84}})));
+  Modelica.Blocks.Interfaces.RealOutput P_el_pump_HP_DHW annotation (Placement(
+        transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=-90,
+        origin={0,-106})));
+  Modelica.Blocks.Interfaces.RealOutput P_el_pump_DHW annotation (Placement(
+        transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=-90,
+        origin={60,-106})));
+  Modelica.Blocks.Interfaces.RealOutput T_Top_DHW
+    annotation (Placement(transformation(extent={{96,44},{116,64}})));
+  Modelica.Blocks.Interfaces.BooleanInput HeatPump_DHW_on
+    annotation (Placement(transformation(extent={{-120,-58},{-86,-24}})));
+  Controls.Control_HR_new control_HR_new(T_Min_Sto=T_Min_hysteresis_DHW)
+    annotation (Placement(transformation(extent={{-88,60},{-60,78}})));
+equation
+  connect(pumpDHW.port_b,bufferStorage. fluidportBottom2) annotation (Line(
+        points={{44,-36},{22,-36},{22,-18.13},{22.875,-18.13}},
+                                                            color={0,127,255}));
+  connect(bufferStorage.portHC1Out,pumpHP. port_a) annotation (Line(points={{9.875,
+          -1.62},{9.875,-40},{-32,-40},{-32,-48},{-36,-48},{-36,-56}},
+                                                        color={0,127,255}));
+  connect(bou1.ports[1],pumpHP. port_a) annotation (Line(points={{12,-57},{-18,-57},
+          {-18,-56},{-36,-56}},      color={0,127,255}));
+  connect(m_flow_freshW.ports[1],pumpDHW. port_a) annotation (Line(points={{67,-10},
+          {62,-10},{62,-36},{60,-36}},      color={0,127,255}));
+  connect(HeatingRod.port_b,bufferStorage. portHC1In) annotation (Line(points={{-32,46},
+          {-24,46},{-24,2.41},{9.75,2.41}},        color={0,127,255}));
+  connect(control_Pump.dp_pump_HP, pumpHP.dp_in) annotation (Line(points={{74.32,
+          91.34},{74.32,29.1},{-46,29.1},{-46,-44}},
+                                                   color={0,0,127}));
+  connect(control_Pump.dp_pump_demand, pumpDHW.dp_in) annotation (Line(points={{74.48,
+          82.94},{74.48,25.1},{52,25.1},{52,-26.4}},   color={0,0,127}));
+  connect(control_Pump.m_flow_pump_demand, m_flow_freshW.m_flow_in) annotation (
+     Line(points={{74.48,87},{82,87},{82,4},{61.4,4}},    color={0,0,127}));
+  connect(bufferStorage.fluidportTop2, dHW.dhw_in) annotation (Line(points={{23.125,
+          8.13},{31.5,8.13},{31.5,52},{41.6,52}}, color={0,127,255}));
+  connect(dHW.dhw_out, bou2.ports[1]) annotation (Line(points={{62.4,52},{64,52},
+          {64,32}},         color={0,127,255}));
+  connect(dHW.dhw_OnOff, control_Pump.Q_demand) annotation (Line(points={{63,71.4},
+          {52.5,71.4},{52.5,82.94},{57.52,82.94}},    color={0,0,127}));
+  connect(pumpHP.port_b, heatPump_Carnot_DIN.port_a1) annotation (Line(points={{-56,-56},
+          {-56,-12}},                           color={0,127,255}));
+  connect(heatPump_Carnot_DIN.port_b1, HeatingRod.port_a) annotation (Line(
+        points={{-56,7.8},{-56,46},{-52,46}},    color={0,127,255}));
+  connect(heatPump_Carnot_DIN.Q_flow_HP_out, control_Pump.Q_HP_actual)
+    annotation (Line(points={{-76,8.2},{-40,8.2},{-40,91.34},{57.52,91.34}},
+        color={0,0,127}));
+  connect(heatPump_Carnot_DIN.Q_flow_HP_out, Q_flow_HP_DHW) annotation (Line(
+        points={{-76,8.2},{2,8.2},{2,-20},{104,-20}},   color={0,0,127}));
+  connect(HeatingRod.Q_flow, Q_flow_HeatingRod_DHW) annotation (Line(points={{-31,52},
+          {22,52},{22,20},{104,20}},       color={0,0,127}));
+  connect(HeatingRod.Q_flow, control_Pump.HeatingRod_actual) annotation (Line(
+        points={{-31,52},{-10,52},{-10,87},{57.68,87}}, color={0,0,127}));
+  connect(senTem_supply_HP.port, heatPump_Carnot_DIN.port_b1) annotation (Line(
+        points={{-91,30},{-82,30},{-82,7.8},{-56,7.8}},   color={0,127,255}));
+  connect(senTem_supply_HP.T, carnot_calc.T_supply) annotation (Line(points={{-86.1,
+          38},{-64,38},{-64,-82.8},{-42.52,-82.8}},       color={0,0,127}));
+  connect(heatPump_Carnot_DIN.Q_flow_HP_out, greaterThreshold.u) annotation (
+      Line(points={{-76,8.2},{-80,8.2},{-80,-59},{-79,-59}},   color={0,0,127}));
+  connect(greaterThreshold.y, carnot_calc.HP_on) annotation (Line(points={{
+          -67.5,-59},{-67.5,-73.5},{-42.78,-73.5},{-42.78,-87}}, color={255,0,
+          255}));
+  connect(carnot_calc.COP_Carnot, COP_carnot_DHW) annotation (Line(points={{
+          -14.7,-87},{41.65,-87},{41.65,-80},{106,-80}}, color={0,0,127}));
+  connect(T_amb.y, carnot_calc.T_amb) annotation (Line(points={{-63.4,-90},{-54,
+          -90},{-54,-90.64},{-43.04,-90.64}}, color={0,0,127}));
+  connect(pumpHP.P, P_el_pump_HP_DHW) annotation (Line(points={{-57,-47},{-0.5,-47},
+          {-0.5,-106},{0,-106}},       color={0,0,127}));
+  connect(pumpDHW.P, P_el_pump_DHW) annotation (Line(points={{43.2,-28.8},{43.2,
+          -64.4},{60,-64.4},{60,-106}}, color={0,0,127}));
+  connect(bufferStorage.TTop, T_Top_DHW) annotation (Line(points={{10,6.44},{54,
+          6.44},{54,54},{106,54}}, color={0,0,127}));
+  connect(bufferStorage.TTop, control_HR_new.T_Top) annotation (Line(points={{
+          10,6.44},{-104,6.44},{-104,72.6},{-88,72.6}}, color={0,0,127}));
+  connect(dHW.Q_dhw, control_HR_new.Q_demand1) annotation (Line(points={{63,62},
+          {-10,62},{-10,77.1},{-88,77.1}}, color={0,0,127}));
+  connect(HeatPump_DHW_on, control_HR_new.HP_on) annotation (Line(points={{-103,
+          -41},{-103,-40.5},{-88,-40.5},{-88,60.9}},
+                                                 color={255,0,255}));
+  connect(heatPump_Carnot_DIN.Q_flow_HP_out, control_HR_new.Q_HP_actual1)
+    annotation (Line(points={{-76,8.2},{-112,8.2},{-112,65.4},{-88,65.4}},
+        color={0,0,127}));
+  connect(control_HR_new.Q_HeatingRod_OnOff, HeatingRod.u) annotation (Line(
+        points={{-59.16,74.4},{-59.16,63.2},{-54,63.2},{-54,52}}, color={0,0,
+          127}));
+  connect(control_HR_new.HP_onoff, heatPump_Carnot_DIN.HP_OnOff) annotation (
+      Line(points={{-59.16,61.8},{-59.16,-27.1},{-66,-27.1},{-66,-12.8}}, color=
+         {0,0,127}));
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false), graphics={
+        Text(
+          extent={{70,16},{132,-8}},
+          lineColor={0,0,0},
+          fillColor={175,175,175},
+          fillPattern=FillPattern.Solid,
+          textString="Q_flow_HeatingRod_DHW"),
+        Text(
+          extent={{68,-36},{132,-44}},
+          lineColor={0,0,0},
+          fillColor={175,175,175},
+          fillPattern=FillPattern.Solid,
+          textString="Q_flow_HP
+_DHW"), Rectangle(
+          extent={{-28,-42},{32,-76}},
+          lineColor={0,0,0},
+          fillColor={175,175,175},
+          fillPattern=FillPattern.Solid),
+        Line(points={{-12,-84},{-12,-62},{2,-72},{16,-62},{16,-84}}, color={0,0,
+              0}),
+        Rectangle(
+          extent={{-68,30},{-26,8}},
+          lineColor={0,0,0},
+          fillColor={255,0,0},
+          fillPattern=FillPattern.Solid),
+        Rectangle(
+          extent={{-68,8},{-26,-14}},
+          lineColor={0,0,0},
+          fillColor={0,0,255},
+          fillPattern=FillPattern.Solid),
+        Line(points={{-28,-66},{-84,-66},{-84,10},{-68,10}}, color={0,0,0}),
+        Line(points={{-26,10},{40,10},{40,-68},{32,-68}}, color={0,0,0}),
+        Polygon(
+          points={{2,86},{-10,50},{-10,44},{-6,40},{-2,38},{6,38},{14,38},{18,
+              40},{20,42},{20,48},{18,52},{16,58},{2,86}},
+          lineColor={0,0,0},
+          lineThickness=1,
+          fillColor={28,108,200},
+          fillPattern=FillPattern.Solid),
+        Rectangle(extent={{-24,90},{34,30}}, lineColor={0,0,0}),
+        Line(points={{-68,22},{-84,22},{-84,74},{-24,74}}, color={0,0,0}),
+        Line(points={{34,74},{58,74},{58,20},{-26,20}}, color={0,0,0}),
+        Text(
+          extent={{76,-92},{140,-100}},
+          lineColor={0,0,0},
+          fillColor={175,175,175},
+          fillPattern=FillPattern.Solid,
+          textString="COP_DHW"),
+        Text(
+          extent={{-32,-86},{32,-94}},
+          lineColor={0,0,0},
+          fillColor={175,175,175},
+          fillPattern=FillPattern.Solid,
+          textString="P_el_pump_HP"),
+        Text(
+          extent={{26,-86},{90,-94}},
+          lineColor={0,0,0},
+          fillColor={175,175,175},
+          fillPattern=FillPattern.Solid,
+          textString="P_el_pump_DHW"),
+        Text(
+          extent={{80,44},{118,32}},
+          lineColor={0,0,0},
+          fillColor={175,175,175},
+          fillPattern=FillPattern.Solid,
+          textString="T_Top_dhw")}),                             Diagram(
+        coordinateSystem(preserveAspectRatio=false)));
+end HeatPump_DHW_DIN_newcontrol;

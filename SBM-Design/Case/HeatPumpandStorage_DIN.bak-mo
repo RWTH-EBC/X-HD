@@ -1,0 +1,5 @@
+within Configurations.Case;
+model HeatPumpandStorage_DIN
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+        coordinateSystem(preserveAspectRatio=false)));
+end HeatPumpandStorage_DIN;
