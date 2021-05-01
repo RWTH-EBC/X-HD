@@ -1,0 +1,89 @@
+within Configurations.HeatPumpandStorages;
+model HeatPump_Carnot
+
+  parameter Real Q_flow_Biv = 6850;
+  parameter Real T_Biv = 271.15;
+  parameter Real T_Na = 273.15-12;
+
+  parameter Real dp_HP = 25000 "Pa";
+  parameter Real m_flow_HP = 0.26 "kg/s";
+  parameter Real Q_flow_HeatLoad = 9710.0752 "W";
+  parameter Real Q_HP_Na = 0.46*Q_flow_HeatLoad "W";
+  parameter Real Q_flow_HP_max = Q_HP_Na + ((Q_flow_Biv-Q_HP_Na)/(T_Biv-T_Na))*(15-(-12))        "W";
+
+  AixLib.Fluid.HeatExchangers.HeaterCooler_u Heater_Ideal(
+    redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,
+    m_flow_nominal=m_flow_HP,
+    dp_nominal=dp_HP,
+    Q_flow_nominal=Q_flow_HP_max,
+    T_start=318.15)
+    annotation (Placement(transformation(extent={{6,22},{26,42}})));
+
+  Modelica.Fluid.Interfaces.FluidPort_b port_b1(redeclare package Medium =
+        Modelica.Media.Water.ConstantPropertyLiquidWater)
+    "Fluid connector b (positive design flow direction is from port_a to port_b)"
+    annotation (Placement(transformation(extent={{88,-110},{108,-90}})));
+  Modelica.Fluid.Interfaces.FluidPort_a port_a1(redeclare package Medium =
+        Modelica.Media.Water.ConstantPropertyLiquidWater)
+    "Fluid connector a (positive design flow direction is from port_a to port_b)"
+    annotation (Placement(transformation(extent={{-110,-110},{-90,-90}})));
+  Modelica.Blocks.Interfaces.RealOutput Q_flow_HP_out "Heat added to the fluid"
+    annotation (Placement(transformation(extent={{92,90},{112,110}})));
+  Modelica.Blocks.Interfaces.RealInput HP_OnOff annotation (Placement(
+        transformation(extent={{-124,78},{-88,114}}), iconTransformation(extent=
+           {{-116,-8},{-100,8}})));
+  Configurations.DataBase.Tamb_TRYAachen_2a T_amb
+    annotation (Placement(transformation(extent={{-100,28},{-80,48}})));
+  Modelica.Blocks.Sources.Constant Q_flow_HP_max1(k=Q_flow_HP_max)
+    annotation (Placement(transformation(extent={{-98,-12},{-78,8}})));
+  Modelica.Blocks.Math.Division division
+    annotation (Placement(transformation(extent={{-36,6},{-26,16}})));
+  Modelica.Blocks.Math.Product product
+    annotation (Placement(transformation(extent={{-18,68},{-8,78}})));
+  DataBase.dotQ_HP_noDHW dotQ_HP_noDHW
+    annotation (Placement(transformation(extent={{-64,30},{-44,50}})));
+equation
+  connect(Heater_Ideal.port_b, port_b1)
+    annotation (Line(points={{26,32},{26,-100},{98,-100}},
+                                                        color={0,127,255}));
+  connect(Heater_Ideal.port_a, port_a1)
+    annotation (Line(points={{6,32},{6,-100},{-100,-100}}, color={0,127,255}));
+  connect(Heater_Ideal.Q_flow, Q_flow_HP_out) annotation (Line(points={{27,38},
+          {30,38},{30,100},{102,100}},color={0,0,127}));
+  connect(division.u2, Q_flow_HP_max1.y) annotation (Line(points={{-37,8},{-64,
+          8},{-64,-2},{-77,-2}},
+                              color={0,0,127}));
+  connect(product.u1, HP_OnOff) annotation (Line(points={{-19,76},{-68,76},{-68,
+          96},{-106,96}}, color={0,0,127}));
+  connect(product.u2, division.y) annotation (Line(points={{-19,70},{-20,70},{
+          -20,16},{-20,11},{-22,11},{-25.5,11}}, color={0,0,127}));
+  connect(product.y, Heater_Ideal.u) annotation (Line(points={{-7.5,73},{-2,73},
+          {-2,38},{4,38}}, color={0,0,127}));
+  connect(T_amb.y, dotQ_HP_noDHW.u[1]) annotation (Line(points={{-79,38},{-74,
+          38},{-74,40},{-66,40}}, color={0,0,127}));
+  connect(dotQ_HP_noDHW.y[1], division.u1) annotation (Line(points={{-43,40},{
+          -40,40},{-40,14},{-37,14}}, color={0,0,127}));
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false), graphics={
+        Rectangle(
+          extent={{100,100},{-100,-100}},
+          pattern=LinePattern.None,
+          lineThickness=1,
+          lineColor={0,0,0},
+          fillColor={212,35,19},
+          fillPattern=FillPattern.Solid),
+        Text(
+          extent={{-62,72},{72,-72}},
+          lineColor={0,0,0},
+          lineThickness=1,
+          textString="HeatPump
+Carnot"),
+        Rectangle(
+          extent={{-98,98},{100,-100}},
+          pattern=LinePattern.None,
+          lineThickness=1),
+        Rectangle(
+          extent={{-100,100},{-32,22}},
+          pattern=LinePattern.None,
+          lineThickness=1)}),                                    Diagram(
+        coordinateSystem(preserveAspectRatio=false)));
+end HeatPump_Carnot;

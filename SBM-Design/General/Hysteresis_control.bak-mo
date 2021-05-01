@@ -1,0 +1,144 @@
+within Configurations.General;
+model Hysteresis_control
+
+  Modelica.Blocks.Interfaces.RealInput T_Top
+    annotation (Placement(transformation(extent={{-136,12},{-100,48}}),
+        iconTransformation(extent={{-116,32},{-100,48}})));
+  Modelica.Blocks.Interfaces.BooleanOutput WP_an
+    annotation (Placement(transformation(extent={{100,-32},{120,-12}})));
+  Modelica.Blocks.Interfaces.RealInput T_Min
+    annotation (Placement(transformation(extent={{-136,-38},{-100,-2}}),
+        iconTransformation(extent={{-116,-18},{-100,-2}})));
+  Modelica.Blocks.Interfaces.RealInput T_Max
+    annotation (Placement(transformation(extent={{-136,-88},{-100,-52}}),
+        iconTransformation(extent={{-116,-68},{-100,-52}})));
+
+  discrete Integer zustand(start = 1);
+  parameter Real dT = 2;
+  parameter Real dTads = 2;
+  parameter Real T_MaxAds = 333.15;
+
+/*initial equation 
+  pre(Lade_Speicher1) = true;
+  pre(Lade_Speicher2) = false;
+  pre(Entlade_Speicher1) = false;
+  pre(Entlade_Speicher2) = false;
+  pre(zustand) = 1; */
+
+  Modelica.Blocks.Interfaces.RealInput Q_demand annotation (Placement(
+        transformation(
+        extent={{13,-13},{-13,13}},
+        rotation=90,
+        origin={61,53})));
+  Modelica.Blocks.Interfaces.BooleanInput Bivalence_true annotation (Placement(
+        transformation(
+        extent={{-14,-14},{14,14}},
+        rotation=-90,
+        origin={-60,54})));
+  Modelica.Blocks.Interfaces.RealInput Q_HP_actual annotation (Placement(
+        transformation(
+        extent={{13,-13},{-13,13}},
+        rotation=90,
+        origin={1,53})));
+  Modelica.Blocks.Logical.Switch switch1 annotation (Placement(transformation(
+        extent={{-7,-7},{7,7}},
+        rotation=-90,
+        origin={-1,-63})));
+  Modelica.Blocks.Sources.Constant const(k=0) annotation (Placement(
+        transformation(
+        extent={{-6,-6},{6,6}},
+        rotation=-90,
+        origin={-22,-20})));
+  Modelica.Blocks.Math.Add add(k2=-1, k1=-1) annotation (Placement(
+        transformation(
+        extent={{-7,-7},{7,7}},
+        rotation=-90,
+        origin={29,1})));
+  Modelica.Blocks.Logical.GreaterThreshold greaterThreshold annotation (
+      Placement(transformation(
+        extent={{-7,-7},{7,7}},
+        rotation=-90,
+        origin={29,-25})));
+  Modelica.Blocks.Logical.Switch switch2 annotation (Placement(transformation(
+        extent={{-7,-7},{7,7}},
+        rotation=-90,
+        origin={25,-51})));
+  Modelica.Blocks.Interfaces.RealOutput heatingRod_dotQ annotation (Placement(
+        transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=-90,
+        origin={0,-88})));
+  Modelica.Blocks.Logical.And and1 annotation (Placement(transformation(
+        extent={{-6,-6},{6,6}},
+        rotation=-90,
+        origin={10,-28})));
+  Modelica.Blocks.Logical.GreaterThreshold greaterThreshold1
+                                                            annotation (
+      Placement(transformation(
+        extent={{-5,-5},{5,5}},
+        rotation=-90,
+        origin={3,11})));
+equation
+  if (((pre(zustand) == 1) and (T_Top < (T_Max))) or ((pre(zustand) == 2) and (T_Top <= T_Min))) then
+    WP_an = true;
+    zustand            = 1;
+  elseif (((pre(zustand) == 1) and (T_Top >= T_Max)) or ((pre(zustand) == 2) and (T_Top > T_Min))) then
+    WP_an = false;
+    zustand            = 2;
+  else
+    WP_an = true;
+    zustand            = 1;
+  end if;
+  connect(const.y, switch1.u3) annotation (Line(points={{-22,-26.6},{-6,-26.6},
+          {-6,-54.6},{-6.6,-54.6}},
+                                color={0,0,127}));
+  connect(Bivalence_true, switch1.u2) annotation (Line(points={{-60,54},{-64,54},
+          {-64,-54.6},{-1,-54.6}}, color={255,0,255}));
+  connect(Q_HP_actual, add.u2) annotation (Line(points={{1,53},{1,31.5},{24.8,
+          31.5},{24.8,9.4}}, color={0,0,127}));
+  connect(Q_demand, add.u1) annotation (Line(points={{61,53},{61,31.5},{33.2,
+          31.5},{33.2,9.4}}, color={0,0,127}));
+  connect(add.y, greaterThreshold.u) annotation (Line(points={{29,-6.7},{29,
+          -11.35},{29,-16.6}}, color={0,0,127}));
+  connect(add.y, switch2.u1) annotation (Line(points={{29,-6.7},{29,-24.35},{
+          30.6,-24.35},{30.6,-42.6}}, color={0,0,127}));
+  connect(const.y, switch2.u3) annotation (Line(points={{-22,-26.6},{-6,-26.6},
+          {-6,-42.6},{19.4,-42.6}},color={0,0,127}));
+  connect(switch2.y, switch1.u1) annotation (Line(points={{25,-58.7},{16.5,
+          -58.7},{16.5,-54.6},{4.6,-54.6}}, color={0,0,127}));
+  connect(switch1.y, heatingRod_dotQ) annotation (Line(points={{-1,-70.7},{-1,
+          -77.35},{0,-77.35},{0,-88}}, color={0,0,127}));
+  connect(greaterThreshold.y, and1.u1) annotation (Line(points={{29,-32.7},{
+          19.5,-32.7},{19.5,-20.8},{10,-20.8}}, color={255,0,255}));
+  connect(Q_HP_actual, greaterThreshold1.u) annotation (Line(points={{1,53},{1,
+          35.5},{3,35.5},{3,17}}, color={0,0,127}));
+  connect(greaterThreshold1.y, and1.u2) annotation (Line(points={{3,5.5},{3,
+          -7.25},{5.2,-7.25},{5.2,-20.8}}, color={255,0,255}));
+  connect(and1.y, switch2.u2) annotation (Line(points={{10,-34.6},{18,-34.6},{
+          18,-42.6},{25,-42.6}}, color={255,0,255}));
+  annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+            -80},{100,40}})),             Icon(coordinateSystem(extent={{-100,-60},
+            {100,60}},  preserveAspectRatio=false), graphics={
+        Rectangle(
+          extent={{-100,60},{100,-60}},
+          lineColor={0,0,0},
+          fillColor={215,215,215},
+          fillPattern=FillPattern.Solid,
+          lineThickness=0.5),
+        Text(
+          extent={{-92,52},{-60,28}},
+          lineColor={0,0,127},
+          textString="T_Top"),
+        Text(
+          extent={{-92,2},{-60,-22}},
+          lineColor={0,0,127},
+          textString="T_Min"),
+        Text(
+          extent={{-92,-28},{-60,-52}},
+          lineColor={0,0,127},
+          textString="T_Max"),
+        Text(
+          extent={{36,14},{92,-10}},
+          lineColor={255,0,255},
+          textString="WP_an")}));
+end Hysteresis_control;

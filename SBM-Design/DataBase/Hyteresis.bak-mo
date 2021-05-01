@@ -1,0 +1,5 @@
+within Configurations.DataBase;
+block Hyteresis
+  "A Hysteresis that switches off when the input signal exceeds a upper threshold and on when the lower threshold is reached"
+  extends Modelica.Blocks.Icons.BooleanBlock;
+end Hyteresis;

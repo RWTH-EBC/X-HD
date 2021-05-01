@@ -1,0 +1,387 @@
+within Configurations.HeatPumpandStorages;
+model HPTConAndStorages_noBuffer
+
+  extends SOvEMS.Models.Icons.IconHPAndStorage;
+
+  replaceable package MediumWater = Modelica.Media.Interfaces.PartialMedium
+    constrainedby Modelica.Media.Interfaces.PartialMedium annotation (
+      choicesAllMatching=true);
+  replaceable package MediumAir = Modelica.Media.Interfaces.PartialMedium
+    constrainedby Modelica.Media.Interfaces.PartialMedium annotation (
+      choicesAllMatching=true);
+
+  parameter Modelica.SIunits.MassFlowRate m_flowEva_nominal(min=0)
+    "Nominal mass flow rate" annotation (Dialog(group="Nominal condition"));
+  parameter Modelica.SIunits.MassFlowRate m_flowCon_nominal(min=0)
+    "Nominal mass flow rate" annotation (Dialog(group="Nominal condition"));
+
+  parameter Modelica.SIunits.Temperature T_start=MediumWater.T_default
+    "Start value of temperature" annotation (Dialog(tab="Initialization"));
+
+  parameter Modelica.SIunits.Conversions.NonSIunits.AngularVelocity_rpm
+    speedHP_max "Maximum and nominal speed of compressor"
+    annotation (Dialog(group="Heat Pump"));
+  parameter Modelica.SIunits.Conversions.NonSIunits.AngularVelocity_rpm
+    speedHP_min "Minimal speed of compressor"
+    annotation (Dialog(group="Heat Pump"));
+
+  AixLib.Fluid.HeatPumps.Carnot_TCon      heatPumpDetailed(
+    redeclare package Medium1 = MediumWater,
+    redeclare package Medium2 = MediumAir,
+    m1_flow_nominal=3*m_flowCon_nominal,
+    m2_flow_nominal=m_flowEva_nominal,
+    show_T=true,
+    dp1_nominal(displayUnit="bar") = 5000,
+    dp2_nominal(displayUnit="bar") = 5000,
+    QCon_flow_max=9900,
+    use_eta_Carnot_nominal=true,
+    QCon_flow_nominal=8500,
+    dTEva_nominal=-6,
+    dTCon_nominal=5,
+    etaCarnot_nominal=0.39)
+    annotation (Placement(transformation(extent={{15.5,-16.5},{-15.5,16.5}},
+        rotation=-90,
+        origin={-63.5,-8.5})));
+  Modelica.Blocks.Sources.Constant constStoragesAmbTemp(k=291.15)
+    annotation (Placement(transformation(extent={{94,-46},{84,-36}})));
+  AixLib.Fluid.Storage.BufferStorage DHWStorage(
+    redeclare package Medium = MediumWater,
+    redeclare package MediumHC1 = MediumWater,
+    redeclare package MediumHC2 = MediumWater,
+    TStart=T_start,
+    TStartWall=T_start,
+    TStartIns=T_start,
+    useHeatingCoil2=false,
+    useHeatingRod=false,
+    redeclare model HeatTransfer =
+        AixLib.Fluid.Storage.BaseClasses.HeatTransferLambdaSimple,
+    data=SOvEMS.DataBase.DHWStorage(),
+    alphaHC1=500)
+    annotation (Placement(transformation(extent={{20,40},{56,84}})));
+  AixLib.Fluid.Sources.MassFlowSource_T m_flowSource(
+    use_m_flow_in=true,
+    nPorts=1,
+    redeclare package Medium = MediumWater,
+    T=283.15)
+    annotation (Placement(transformation(extent={{84,18},{64,38}})));
+  AixLib.Fluid.Sources.FixedBoundary boundaryDHWOut(nPorts=1, redeclare package
+      Medium = MediumWater)
+    annotation (Placement(transformation(extent={{94,78},{74,98}})));
+  Modelica.Blocks.Interfaces.BooleanInput onOff
+    "Connector of Boolean input signal" annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=-90,
+        origin={-70,104})));
+  Modelica.Blocks.Interfaces.RealInput mFlowDHW
+    "Prescribed mass flow rate" annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=270,
+        origin={64,106})));
+  Modelica.Blocks.Interfaces.BooleanInput DHW
+    "Connector of Boolean input signal" annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=-90,
+        origin={-44,104})));
+  Modelica.Blocks.Interfaces.RealInput TAmbAir(unit="K", displayUnit="degC")
+    annotation (Placement(transformation(extent={{-112,52},{-92,72}})));
+  Modelica.Thermal.HeatTransfer.Sources.PrescribedTemperature tempDHWStoLosses
+    annotation (Placement(transformation(extent={{82,58},{74,66}})));
+  AixLib.Fluid.Sources.MassFlowSource_T boundaryEva(
+    nPorts=1,
+    redeclare package Medium = MediumAir,
+    use_m_flow_in=false,
+    use_T_in=true,
+    m_flow=10)  annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=-90,
+        origin={-78,40})));
+  AixLib.Fluid.Sources.FixedBoundary boundaryEvaOut(nPorts=1, redeclare package
+      Medium = MediumAir)
+    annotation (Placement(transformation(extent={{-104,-44},{-84,-24}})));
+  AixLib.Fluid.Actuators.Valves.ThreeWayLinear                val(
+    redeclare package Medium = MediumWater,
+    fraK=0.5,
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    dpValve_nominal(displayUnit="bar") = 1000,
+    m_flow_nominal=m_flowCon_nominal,
+    l={Modelica.Constants.eps,Modelica.Constants.eps})
+    annotation (Placement(transformation(extent={{14,-36},{-6,-16}})));
+  Modelica.Blocks.Sources.Constant constDHW(k=1)
+    annotation (Placement(transformation(extent={{-38,56},{-32,62}})));
+  Modelica.Blocks.Sources.Constant constSH(k=0)
+    annotation (Placement(transformation(extent={{-38,46},{-32,52}})));
+  AixLib.Utilities.Logical.SmoothSwitch switchDHW
+    annotation (Placement(transformation(extent={{-24,50},{-16,58}})));
+  Modelica.Blocks.Continuous.FirstOrder firstOrderDHWValve(
+    y_start=0.5,
+    T=10,
+    k=1)  annotation (Placement(transformation(extent={{-16,30},{-6,40}})));
+  AixLib.Fluid.Sensors.TemperatureTwoPort senTemDHWCold(
+    redeclare package Medium = MediumWater,
+    T_start=T_start,
+    m_flow_nominal=m_flowCon_nominal)
+    annotation (Placement(transformation(extent={{58,22},{48,34}})));
+  AixLib.Fluid.Sensors.TemperatureTwoPort senTemDHWHot(
+    redeclare package Medium = MediumWater,
+    m_flow_nominal=m_flowEva_nominal,
+    T_start=T_start)
+    annotation (Placement(transformation(extent={{48,84},{58,96}})));
+  AixLib.Fluid.Sensors.TemperatureTwoPort senTemSHFlow(
+    redeclare package Medium = MediumWater,
+    T_start=T_start,
+    m_flow_nominal=m_flowCon_nominal)
+    annotation (Placement(transformation(extent={{36,-22},{46,-8}})));
+  AixLib.Fluid.Sensors.TemperatureTwoPort senTemSHReturn(
+    redeclare package Medium = MediumWater,
+    T_start=T_start,
+    m_flow_nominal=m_flowCon_nominal)
+    annotation (Placement(transformation(extent={{62,-90},{52,-78}})));
+  AixLib.Fluid.Sources.FixedBoundary boundaryHC(
+    redeclare package Medium = MediumWater,
+    p=200000,
+    nPorts=1)
+    annotation (Placement(transformation(extent={{-4,-50},{-16,-38}})));
+  AixLib.Fluid.Movers.SpeedControlled_y pumpHC(
+    redeclare package Medium = MediumWater,
+    show_T=true,
+    addPowerToMedium=false,
+    inputType=AixLib.Fluid.Types.InputType.Continuous,
+    per(
+      motorCooledByFluid=false,
+      use_powerCharacteristic=true,
+      power(V_flow={0,pumpHC.per.pressure.V_flow[end]}, P={0,50}),
+      pressure(V_flow={0,0.15/MediumWater.density_pTX(
+            p=MediumWater.p_default,
+            T=MediumWater.T_default,
+            X=MediumWater.X_default)}, dp={0.6e5,0})),
+    allowFlowReversal=false)
+    annotation (Placement(transformation(extent={{92,-94},{72,-74}})));
+  Modelica.Fluid.Interfaces.FluidPort_b portHCFlow(redeclare final package
+      Medium = MediumWater)
+    "Fluid connector b (positive design flow direction is from port_a to port_b)"
+    annotation (Placement(transformation(extent={{110,-20},{90,0}})));
+  Modelica.Fluid.Interfaces.FluidPort_a portHCReturn(redeclare final package
+      Medium = MediumWater)
+    "Fluid connector a (positive design flow direction is from port_a to port_b)"
+    annotation (Placement(transformation(extent={{110,-94},{90,-74}})));
+  Modelica.Blocks.Interfaces.RealInput yPumpHC_rel(
+    unit="1",
+    min=0.0,
+    max=1.0) annotation (Placement(transformation(extent={{112,-70},{92,-50}})));
+  AixLib.Fluid.Movers.SpeedControlled_y pumpHPCon(
+    redeclare package Medium = MediumWater,
+    show_T=true,
+    addPowerToMedium=false,
+    inputType=AixLib.Fluid.Types.InputType.Continuous,
+    allowFlowReversal=false,
+    per(
+      motorCooledByFluid=false,
+      use_powerCharacteristic=true,
+      power(V_flow={0,pumpHC.per.pressure.V_flow[end]}, P={0,50}),
+      pressure(V_flow={0,0.04,0.1,m_flowCon_nominal,0.17} .* 3 ./
+            MediumWater.density_pTX(
+            p=MediumWater.p_default,
+            T=MediumWater.T_default,
+            X=MediumWater.X_default), dp={0.75e5,0.7e5,0.5e5,0.155e5,0})))
+    annotation (Placement(transformation(extent={{-14,-4},{-34,-24}})));
+  AixLib.Fluid.Sensors.MassFlowRate senMasFloHPCon(redeclare package Medium =
+        MediumWater)
+    annotation (Placement(transformation(extent={{-20,-2},{-8,10}})));
+  AixLib.Fluid.Sensors.TemperatureTwoPort senTemConOut(
+    redeclare package Medium = MediumWater,
+    T_start=T_start,
+    m_flow_nominal=m_flowCon_nominal,
+    transferHeat=true,
+    TAmb=293.15)
+    annotation (Placement(transformation(extent={{-34,-2},{-24,10}})));
+  Modelica.Blocks.Interfaces.RealOutput TConOut(
+    final quantity="ThermodynamicTemperature",
+    final unit="K",
+    displayUnit="degC",
+    min=0,
+    start=T_start) "Temperature of the passing fluid" annotation (Placement(
+        transformation(
+        origin={10,106},
+        extent={{10,-10},{-10,10}},
+        rotation=270)));
+  AixLib.Fluid.Sensors.TemperatureTwoPort senTemDHWStoCoilOut(
+    redeclare package Medium = MediumWater,
+    T_start=T_start,
+    m_flow_nominal=m_flowCon_nominal) annotation (Placement(transformation(
+        extent={{-5.5,-6.5},{5.5,6.5}},
+        rotation=-90,
+        origin={16.5,28.5})));
+  AixLib.Fluid.Sensors.TemperatureTwoPort senTemBufStoOut(
+    redeclare package Medium = MediumWater,
+    T_start=T_start,
+    m_flow_nominal=m_flowCon_nominal) annotation (Placement(transformation(
+        extent={{5.5,6.5},{-5.5,-6.5}},
+        rotation=-90,
+        origin={6.5,-59.5})));
+  Modelica.Blocks.Math.BooleanToReal booleanToReal(realTrue=0.5)
+    annotation (Placement(transformation(extent={{-54,-44},{-66,-32}})));
+  Modelica.Blocks.MathBoolean.OnDelay onDelayHP(delayTime=pumpHC.riseTime*0.5)
+    annotation (Placement(transformation(
+        extent={{-6,-6},{6,6}},
+        rotation=-90,
+        origin={-62,62})));
+  AixLib.Fluid.Actuators.Valves.TwoWayLinear valveBypass(
+    riseTime=10,
+    redeclare package Medium = MediumWater,
+    m_flow_nominal=m_flowCon_nominal,
+    allowFlowReversal=false,
+    dpValve_nominal=0.56e5) annotation (Placement(transformation(
+        extent={{-7,-7},{7,7}},
+        rotation=-90,
+        origin={49,-35})));
+  Modelica.Blocks.Sources.Constant valveBypassOpe(k=1)
+    "constant opening of bypass valve"
+    annotation (Placement(transformation(extent={{72,-62},{64,-54}})));
+  AixLib.Fluid.FixedResistances.Junction junFlow(
+    dp_nominal={0,0,0},
+    redeclare package Medium = MediumWater,
+    m_flow_nominal={m_flowCon_nominal,-m_flowCon_nominal,-m_flowCon_nominal/2})
+    annotation (Placement(transformation(extent={{50,-20},{60,-10}})));
+  AixLib.Fluid.FixedResistances.Junction junReturn(
+    dp_nominal={0,0,0},
+    redeclare package Medium = MediumWater,
+    m_flow_nominal={m_flowCon_nominal,-m_flowCon_nominal,m_flowCon_nominal/2})
+    annotation (Placement(transformation(extent={{46,-50},{36,-60}})));
+  AixLib.Fluid.Actuators.Valves.ThreeWayLinear valFlow(
+    redeclare package Medium = MediumWater,
+    fraK=0.5,
+    dpValve_nominal(displayUnit="bar") = 1000,
+    m_flow_nominal=m_flowCon_nominal,
+    l={Modelica.Constants.eps,Modelica.Constants.eps},
+    portFlowDirection_1=Modelica.Fluid.Types.PortFlowDirection.Leaving,
+    portFlowDirection_2=Modelica.Fluid.Types.PortFlowDirection.Entering,
+    portFlowDirection_3=Modelica.Fluid.Types.PortFlowDirection.Leaving)
+    annotation (Placement(transformation(extent={{16,-6},{-4,14}})));
+  AixLib.Fluid.Sensors.RelativePressure senRelPreDHWSto(redeclare package
+      Medium = MediumWater)
+    annotation (Placement(transformation(extent={{-18,70},{-2,86}})));
+  AixLib.Fluid.FixedResistances.PressureDrop extraResHC(
+    redeclare package Medium = MediumWater,
+    dp_nominal(displayUnit="bar") = 3000,
+    m_flow_nominal=m_flowCon_nominal)
+    "The pressure drop caused by flow resistance in the condenser" annotation (
+      Placement(transformation(
+        extent={{-5.5,-6.5},{5.5,6.5}},
+        rotation=0,
+        origin={25.5,-15.5})));
+  Modelica.Blocks.Math.Add basePumpHPConAdd
+    annotation (Placement(transformation(extent={{-68,-64},{-56,-52}})));
+  Modelica.Blocks.Sources.Constant basePumpHPCon(k=0.5)
+    annotation (Placement(transformation(extent={{-86,-66},{-78,-58}})));
+  Modelica.Blocks.Interfaces.RealInput TSetConOut(unit="K", displayUnit="degC")
+    annotation (Placement(transformation(extent={{-110,-94},{-90,-74}})));
+equation
+  connect(m_flowSource.m_flow_in, mFlowDHW) annotation (Line(points={{84,36},{100,
+          36},{100,106},{64,106}}, color={0,0,127}));
+  connect(tempDHWStoLosses.port,DHWStorage. heatportOutside) annotation (Line(
+        points={{74,62},{72,62},{72,63.32},{55.55,63.32}}, color={191,0,0}));
+  connect(tempDHWStoLosses.T, constStoragesAmbTemp.y) annotation (Line(points={{
+          82.8,62},{88,62},{88,-20},{83.5,-20},{83.5,-41}}, color={0,0,127}));
+  connect(TAmbAir, boundaryEva.T_in)
+    annotation (Line(points={{-102,62},{-74,62},{-74,52}}, color={0,0,127}));
+  connect(constSH.y, switchDHW.u3) annotation (Line(
+      points={{-31.7,49},{-25.75,49},{-25.75,50.8},{-24.8,50.8}},
+      color={0,0,127},
+      smooth=Smooth.None));
+  connect(constDHW.y, switchDHW.u1) annotation (Line(
+      points={{-31.7,59},{-28.75,59},{-28.75,57.2},{-24.8,57.2}},
+      color={0,0,127},
+      smooth=Smooth.None));
+  connect(switchDHW.y, firstOrderDHWValve.u) annotation (Line(points={{-15.6,54},
+          {-12,54},{-12,46},{-22,46},{-22,35},{-17,35}}, color={0,0,127}));
+  connect(DHW, switchDHW.u2) annotation (Line(points={{-44,104},{-42,104},{-42,54},
+          {-24.8,54}}, color={255,0,255}));
+  connect(firstOrderDHWValve.y, val.y) annotation (Line(points={{-5.5,35},{-2,35},
+          {-2,-4},{4,-4},{4,-14}}, color={0,0,127}));
+  connect(senTemDHWCold.port_a, m_flowSource.ports[1])
+    annotation (Line(points={{58,28},{62,28},{62,28},{64,28}},
+                                               color={0,127,255}));
+  connect(senTemDHWCold.port_b,DHWStorage. fluidportBottom2) annotation (Line(
+        points={{48,28},{43.175,28},{43.175,39.78}}, color={0,127,255}));
+  connect(DHWStorage.fluidportTop2, senTemDHWHot.port_a) annotation (Line(
+        points={{43.625,84.22},{43.625,90},{48,90}}, color={0,127,255}));
+  connect(senTemDHWHot.port_b, boundaryDHWOut.ports[1]) annotation (Line(points=
+         {{58,90},{66,90},{66,88},{74,88}}, color={0,127,255}));
+  connect(pumpHC.port_b, senTemSHReturn.port_a)
+    annotation (Line(points={{72,-84},{62,-84}}, color={0,127,255}));
+  connect(pumpHC.port_a, portHCReturn)
+    annotation (Line(points={{92,-84},{100,-84}}, color={0,127,255}));
+  connect(yPumpHC_rel, pumpHC.y)
+    annotation (Line(points={{102,-60},{82,-60},{82,-72}}, color={0,0,127}));
+  connect(val.port_2, pumpHPCon.port_a) annotation (Line(points={{-6,-26},{-10,
+          -26},{-10,-14},{-14,-14}}, color={0,127,255}));
+  connect(pumpHPCon.port_a, boundaryHC.ports[1]) annotation (Line(points={{-14,
+          -14},{-14,-30},{-20,-30},{-20,-44},{-16,-44}}, color={0,127,255}));
+  connect(senMasFloHPCon.port_a, senTemConOut.port_b)
+    annotation (Line(points={{-20,4},{-24,4}}, color={0,127,255}));
+  connect(senTemConOut.T, TConOut) annotation (Line(points={{-29,10.6},{-29,20},
+          {2,20},{2,90},{10,90},{10,106}}, color={0,0,127}));
+  connect(val.port_1, senTemDHWStoCoilOut.port_b)
+    annotation (Line(points={{14,-26},{22,-26},{22,20},{16.5,20},{16.5,23}},
+                                                           color={0,127,255}));
+  connect(senTemDHWStoCoilOut.port_a, DHWStorage.portHC1Out) annotation (Line(
+        points={{16.5,34},{16.5,67.72},{19.775,67.72}},
+                                                      color={0,127,255}));
+  connect(val.port_3, senTemBufStoOut.port_b)
+    annotation (Line(points={{4,-36},{6,-36},{6.5,-54}}, color={0,127,255}));
+  connect(onOff, booleanToReal.u) annotation (Line(points={{-70,104},{-70,80},{
+          -50,80},{-50,-38},{-52.8,-38}}, color={255,0,255}));
+  connect(valveBypass.y, valveBypassOpe.y) annotation (Line(points={{57.4,-35},
+          {56,-35},{56,-58},{63.6,-58}}, color={0,0,127}));
+  connect(junFlow.port_3, valveBypass.port_a) annotation (Line(points={{55,-20},
+          {46,-20},{46,-26},{49,-26},{49,-28}}, color={0,127,255}));
+  connect(junReturn.port_3, valveBypass.port_b) annotation (Line(points={{41,-50},
+          {40,-50},{40,-42},{49,-42}},      color={0,127,255}));
+  connect(senTemBufStoOut.port_a, junReturn.port_2) annotation (Line(points={{
+          6.5,-65},{6.5,-76},{26,-76},{26,-55},{36,-55}}, color={0,127,255}));
+  connect(junReturn.port_1, senTemSHReturn.port_b) annotation (Line(points={{46,
+          -55},{48,-55},{48,-84},{52,-84}}, color={0,127,255}));
+  connect(senTemSHFlow.port_b, junFlow.port_1)
+    annotation (Line(points={{46,-15},{50,-15}}, color={0,127,255}));
+  connect(junFlow.port_2, portHCFlow) annotation (Line(points={{60,-15},{78,-15},
+          {78,-10},{100,-10}}, color={0,127,255}));
+  connect(senMasFloHPCon.port_b, valFlow.port_2)
+    annotation (Line(points={{-8,4},{-4,4}}, color={0,127,255}));
+  connect(firstOrderDHWValve.y, valFlow.y)
+    annotation (Line(points={{-5.5,35},{6,35},{6,16}}, color={0,0,127}));
+  connect(senRelPreDHWSto.port_a, DHWStorage.portHC1In) annotation (Line(points=
+         {{-18,78},{-20,78},{-20,86},{12,86},{12,74.54},{19.55,74.54}}, color={
+          0,127,255}));
+  connect(senRelPreDHWSto.port_b, DHWStorage.portHC1Out) annotation (Line(
+        points={{-2,78},{6,78},{6,67.72},{19.775,67.72}}, color={0,127,255}));
+  connect(valFlow.port_3, extraResHC.port_a) annotation (Line(points={{6,-6},{6,
+          -10},{18,-10},{18,-15},{20,-15.5}}, color={0,127,255}));
+  connect(extraResHC.port_b, senTemSHFlow.port_a) annotation (Line(points={{31,
+          -15.5},{33.5,-15.5},{33.5,-15},{36,-15}}, color={0,127,255}));
+  connect(valFlow.port_1, DHWStorage.portHC1In) annotation (Line(points={{16,4},
+          {20,4},{20,16},{10,16},{10,74.54},{19.55,74.54}}, color={0,127,255}));
+  connect(basePumpHPCon.y, basePumpHPConAdd.u2) annotation (Line(points={{-77.6,
+          -62},{-74,-62},{-74,-61.6},{-69.2,-61.6}}, color={0,0,127}));
+  connect(booleanToReal.y, basePumpHPConAdd.u1) annotation (Line(points={{-66.6,
+          -38},{-72,-38},{-72,-40},{-76,-40},{-76,-54.4},{-69.2,-54.4}}, color=
+          {0,0,127}));
+  connect(basePumpHPConAdd.y, pumpHPCon.y) annotation (Line(points={{-55.4,-58},
+          {-24,-58},{-24,-26}}, color={0,0,127}));
+  connect(boundaryEva.ports[1], heatPumpDetailed.port_a2) annotation (Line(
+        points={{-78,30},{-78,20},{-73.4,20},{-73.4,7}}, color={0,127,255}));
+  connect(heatPumpDetailed.port_b2, boundaryEvaOut.ports[1]) annotation (Line(
+        points={{-73.4,-24},{-74,-24},{-74,-34},{-84,-34}}, color={0,127,255}));
+  connect(heatPumpDetailed.port_a1, pumpHPCon.port_b) annotation (Line(points={
+          {-53.6,-24},{-54,-24},{-54,-30},{-38,-30},{-38,-14},{-34,-14}}, color=
+         {0,127,255}));
+  connect(heatPumpDetailed.port_b1, senTemConOut.port_a) annotation (Line(
+        points={{-53.6,7},{-53.6,18},{-34,18},{-34,4}}, color={0,127,255}));
+  connect(onOff, onDelayHP.u) annotation (Line(points={{-70,104},{-66,104},{-66,
+          70.4},{-62,70.4}}, color={255,0,255}));
+  connect(TSetConOut, heatPumpDetailed.TSet) annotation (Line(points={{-100,-84},
+          {-48.65,-84},{-48.65,-27.1}}, color={0,0,127}));
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+        coordinateSystem(preserveAspectRatio=false)));
+end HPTConAndStorages_noBuffer;
