@@ -4,4 +4,8 @@ X-HD is a framework to exploit heat pump system design methods. Therefore, we us
 
 Idealised bivalent heat pump heating system based on two typical hydraulic structures. Models for components are taken from library AixLib: https://github.com/RWTH-EBC/AixLib
 
-A detailed description, source code and publications will follow soon.
+A detailed description and publications will follow soon.
+
+
+
+
