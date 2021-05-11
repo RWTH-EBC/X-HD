@@ -1,1 +1,1 @@
-Current library developments are in the branch: VCLib_dev
+Current library developments are in the branch: issue01_VCLibDev
