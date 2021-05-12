@@ -17,7 +17,7 @@ res_path = os.path.join(Path(__file__).parents[1], 'Results')
 if not os.path.exists(os.path.join(PATH_DYMOLA, "Modelica", "Library", "python_interface")):
     sys.exit("[ERROR] Python Interface was not found in given folder. Program will be aborted!")
 sys.path.insert(0, os.path.join(PATH_DYMOLA, r'Modelica\Library\python_interface\dymola.egg'))
-Aixlib_path = r"C:\Users\aku-fst\AixLib_Teaser\AixLib\Aixlib"
+Aixlib_path = r"Modelica\AixLib\Aixlib"
 Output_path = os.path.join(r"Results\Teaser_Output")
 WPSmodel_path = r"D:\Remote-User\aku-fst\Hiwi\normativ-hps-design\Models\HPS_model\package.mo"  # path to HPS model
 
