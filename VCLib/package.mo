@@ -16,8 +16,8 @@ extends Modelica.Icons.Package;
 
 annotation (uses(
     AixLib(version="0.7.3"),
-    Modelica(version="4.0.0"),
-    ModelicaServices(version="4.0.0")),
+    ModelicaServices(version="4.0.0"),
+    Modelica(version="3.2.3")),
                            version="1.0.4",
   conversion(from(version={"2","1"}, script=
           "modelica://VCLib/ConvertFromVCLib_2.mos")),Documentation(revisions="<html>

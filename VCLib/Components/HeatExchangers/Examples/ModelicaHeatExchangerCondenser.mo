@@ -33,8 +33,8 @@ model ModelicaHeatExchangerCondenser
     area_h_1=0.075*20,
     area_h_2=0.075*20,
     redeclare model HeatTransfer_1 =
-      Modelica.Fluid.Pipes.BaseClasses.HeatTransfer.LocalPipeFlowHeatTransfer
-        (alpha0=6000),
+      Modelica.Fluid.Pipes.BaseClasses.HeatTransfer.LocalPipeFlowHeatTransfer (
+         alpha0=6000),
     redeclare model HeatTransfer_2 =
       Modelica.Fluid.Pipes.BaseClasses.HeatTransfer.ConstantFlowHeatTransfer (
          alpha0=2000),

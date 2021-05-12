@@ -56,8 +56,8 @@ model ModularExpansionValvesPressureDifference
         rotation=-90,
         origin={-40,0})));
 
-  Components.Interfaces.PortsAThroughPortB portsAThroughPortB(redeclare
-      package Medium =
+  Components.Interfaces.PortsAThroughPortB portsAThroughPortB(redeclare package
+              Medium =
                Medium, nVal=nVal)
     "Model to connect each valves' outlet pipe with each other" annotation (
       Placement(transformation(
