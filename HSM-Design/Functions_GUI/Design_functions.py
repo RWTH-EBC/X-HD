@@ -36,21 +36,25 @@ def visualize_res(df_res, y):
 
 
 def df_creator(df_res_path):
-    dmf = DyMat.DyMatFile(df_res_path)
-    # nominal powers
-    nominal_hp = dmf.data('generationCase.heatPump.Q_flowTableMax')[0] #  Q_flowNom
-    nominal_hr = dmf.data('generationCase.heatingRod.P_elNom')[0]
-    plot_dict = {'demand_heat': dmf.data('demandCase.buildingDemandCase.building.TimeTable_QDem.y[1]')[240:],
-                 'demand_dhw': dmf.data('demandCase.dhwDemandCase.dhw.TimeTable_DHW.y[1]')[240:],
-                 'produced_heat': dmf.data('generationCase.heatPump.SwitchHeatFlowCondenser.y')[240:],
-                 'relative_hp': dmf.data('generationCase.heatPump.SwitchHeatFlowCondenser.y')[240:] / nominal_hp,
-                 'electrical_hp': dmf.data('generationCase.heatPump.P_el')[240:],
-                 'electrical_hr': dmf.data('generationCase.heatingRod.P_el')[240:],
-                 'relative_hr': dmf.data('generationCase.heatingRod.switch1.y')[240:] / nominal_hr,
-                 'cop': dmf.data('generationCase.heatPump.Table_COP.y')[240:],
-                 'amb_temp': dmf.data('combiTimeTable_T_amb.y[1]')[240:],
-                 'sto_dhw_top': dmf.data('demandCase.T_stoTopDhw')[240:],
-                 'sto_buf_top': dmf.data('demandCase.T_stoTopBuf')[240:],
-                 'time': np.arange(0, len(dmf.data('demandCase.T_stoTopDhw')[240:]), 1)}
-    df_res = pd.DataFrame.from_dict(plot_dict)
-    return df_res
+    if os.path.exists(df_res_path+'.mat'):
+
+        dmf = DyMat.DyMatFile(df_res_path)
+        # nominal powers
+        nominal_hp = dmf.data('generationCase.heatPump.Q_flowTableMax')[0] #  Q_flowNom
+        nominal_hr = dmf.data('generationCase.heatingRod.P_elNom')[0]
+        plot_dict = {'demand_heat': dmf.data('demandCase.buildingDemandCase.building.TimeTable_QDem.y[1]')[240:],
+                     'demand_dhw': dmf.data('demandCase.dhwDemandCase.dhw.TimeTable_DHW.y[1]')[240:],
+                     'produced_heat': dmf.data('generationCase.heatPump.SwitchHeatFlowCondenser.y')[240:],
+                     'relative_hp': dmf.data('generationCase.heatPump.SwitchHeatFlowCondenser.y')[240:] / nominal_hp,
+                     'electrical_hp': dmf.data('generationCase.heatPump.P_el')[240:],
+                     'electrical_hr': dmf.data('generationCase.heatingRod.P_el')[240:],
+                     'relative_hr': dmf.data('generationCase.heatingRod.switch1.y')[240:] / nominal_hr,
+                     'cop': dmf.data('generationCase.heatPump.Table_COP.y')[240:],
+                     'amb_temp': dmf.data('combiTimeTable_T_amb.y[1]')[240:],
+                     'sto_dhw_top': dmf.data('demandCase.T_stoTopDhw')[240:],
+                     'sto_buf_top': dmf.data('demandCase.T_stoTopBuf')[240:],
+                     'time': np.arange(0, len(dmf.data('demandCase.T_stoTopDhw')[240:]), 1)}
+        df_res = pd.DataFrame.from_dict(plot_dict)
+        return df_res
+    else:
+        return pd.DataFrame(0, index=np.arange(2), columns=['time', 'dummy'])

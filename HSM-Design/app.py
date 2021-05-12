@@ -420,7 +420,7 @@ app.layout = html.Div(style={'backgroundColor': colors['white']}, children=[
                                 ]),
                             ]),
                         ]),
-                        html.Div(className="six columns", style={}, children=[
+                        html.Div(id="location", className="six columns", style={}, children=[
                             html.Div(className="row", style={'padding': 5, 'backgroundColor': colors['ebcgrey'],
                                                              'marginBottom': '2em'}, children=[
                                 html.Div(className="six columns", style={}, children=[
@@ -850,6 +850,9 @@ app.layout = html.Div(style={'backgroundColor': colors['white']}, children=[
     html.Div(id='error', style={'display': 'inline-block'}, children=[
 
     ]),
+    html.Div(id='run-message', style={'display': 'inline-block'}, children=[
+
+    ]),
 
     # TODO: graph
     html.Div(id='plots', style={'display': 'none'}, children=[
@@ -1032,7 +1035,7 @@ def display_weather_option(calc):
 
 # dialog for individual temperature is shown
 @app.callback(
-    [Output('ind-weather', 'style'), Output('building-data', 'style')],
+    [Output('ind-weather', 'style'), Output('location', 'style')],
     [Input('check-calc', 'value'), Input('check-weather', 'value')])
 def display_inidividual_weather(calc, weather):
     if 'heat-demand' in calc:
@@ -1332,15 +1335,18 @@ def update_config_vditab(circ, circ_temp, fac_storage, num_unit, dem_con, bl_per
 
 # disable button while calculation is performed
 @app.callback(
-    [Output('start', 'disabled'), Output('error', 'children')],
-    [Input('start', 'n_clicks'), Input('trigger', 'children')])
-def disable_button(clicked, trigger):
+    [Output('start', 'disabled'), Output('run-message', 'children')],
+    [Input('start', 'n_clicks'), Input('trigger', 'children'), Input('error', 'children')])
+def disable_button(clicked, trigger, error):
+    context = [d['prop_id'] for d in dash.callback_context.triggered]
+    print(context)
     context = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
     # if the button triggered the function and button was pressed once already
-    if context == 'start' and clicked is not None:
+    print(context)
+    if 'start.n_clicks' in context and clicked is not None:
         if clicked > 0:
             return True, 'Calculation is running...'
-    elif context == 'trigger':
+    if 'trigger.children' in context:
         time.sleep(3)
         return False, ''
     else:
@@ -1352,8 +1358,8 @@ def disable_button(clicked, trigger):
     [Output('error', 'children'), Output('trigger', 'children'), Output('plots', 'style')],
     [Input('start', 'n_clicks'), Input('demand-calc', 'value'), Input('check-calc', 'value'),
      Input('check-weather', 'value'), Input('yearsim', 'value'), Input('design-year', 'value'),
-     Input('scop', 'value'), Input('design-scop', 'value')])
-def start_calculation(clicked, teaser, calc, weather, year, design_year, scop, design_scop):
+     Input('scop', 'value'), Input('design-scop', 'value'), Input('trigger', 'children')])
+def start_calculation(clicked, teaser, calc, weather, year, design_year, scop, design_scop, trigger):
     global df_res_din
     global df_res_vdi
     global df_res_ind
@@ -1408,7 +1414,7 @@ def start_calculation(clicked, teaser, calc, weather, year, design_year, scop, d
                 yearplot = True
             else:
                 return 'It was no Design selected. Therefore a annual simulation was not possible. ' \
-                       'Please select a normative Design the next time.', 1, {'display': 'none'}
+                       'Please select a normative Design the next time.', 2, {'display': 'none'}
         else:
             yearplot = False
 
@@ -1426,14 +1432,14 @@ def start_calculation(clicked, teaser, calc, weather, year, design_year, scop, d
                     result_dict['scop_ind'] = Func.scop_norm(abs_config_path, result_dict['scop_ind_points'])
             else:
                 return 'It was no normative Design selected. Therefore a calculation of the COP was not possible. ' \
-                       'Please select a normative Design the next time.', 1, {'display': 'none'}
+                       'Please select a normative Design the next time.', 3, {'display': 'none'}
         print(result_dict)
         if yearplot:
             print(result_dict)
-            return 'Calculation is Done. See the results below.', 1, {'display': 'block'}
+            return 'Calculation is Done. See the results below.', 4, {'display': 'block'}
         else:
-            return 'Calculation is Done. See the results below.', 1, {'display': 'none'}
-    return '', 1, {'display': 'none'}
+            return 'Calculation is Done. See the results below.', 5, {'display': 'none'}
+    return '', 0, {'display': 'none'}
 
 
 def create_time_series(dff, axis_type, title):

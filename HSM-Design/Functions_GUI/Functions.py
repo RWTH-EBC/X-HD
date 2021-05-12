@@ -11,18 +11,22 @@ from pathlib import Path
 
 # paths
 PATH_DYMOLA = r"C:\Program Files\Dymola 2021"
-Aixlib_path = r"C:\Users\aku-fst\AixLib_Teaser\AixLib\Aixlib"
-Output_path = os.path.join(r"C:\Users\aku-fst\Teaser_Output")
 comp_path = r"C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC"
-WPSmodel_path = r"D:\Remote-User\aku-fst\Hiwi\normativ-hps-design\Models\HPS_model\package.mo"  # path to HPS model
+
 res_path = os.path.join(Path(__file__).parents[1], 'Results')
 if not os.path.exists(os.path.join(PATH_DYMOLA, "Modelica", "Library", "python_interface")):
     sys.exit("[ERROR] Python Interface was not found in given folder. Program will be aborted!")
 sys.path.insert(0, os.path.join(PATH_DYMOLA, r'Modelica\Library\python_interface\dymola.egg'))
+Aixlib_path = r"C:\Users\aku-fst\AixLib_Teaser\AixLib\Aixlib"
+Output_path = os.path.join(r"Results\Teaser_Output")
+WPSmodel_path = r"D:\Remote-User\aku-fst\Hiwi\normativ-hps-design\Models\HPS_model\package.mo"  # path to HPS model
 
 if not os.path.exists(res_path):
     os.mkdir(res_path)
     print("Directory ", res_path,  " Created ")
+    os.mkdir(res_path + "/DIN")
+    os.mkdir(res_path + "/VDI")
+    os.mkdir(res_path + "/Teaser_Output")
 
 from dymola.dymola_interface import DymolaInterface
 

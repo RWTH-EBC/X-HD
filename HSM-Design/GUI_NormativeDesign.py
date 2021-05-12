@@ -2,7 +2,6 @@ import sys
 from PyQt5 import QtWidgets, uic
 import openpyxl as xl
 import Functions_GUI.Functions as Func
-import Functions_GUI.SCOP_nachHendrik as Funcscop
 import os
 
 # path to this module
