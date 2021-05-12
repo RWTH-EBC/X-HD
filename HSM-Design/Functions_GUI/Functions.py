@@ -8,18 +8,15 @@ from scipy.io import savemat, loadmat
 import openpyxl as xl
 from pathlib import Path
 
-
 # paths
+# TODO: ask for paths in app once
 PATH_DYMOLA = r"C:\Program Files\Dymola 2021"
-comp_path = r"C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC"
+comp_path = r"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC"
 
 res_path = os.path.join(Path(__file__).parents[1], 'Results')
-if not os.path.exists(os.path.join(PATH_DYMOLA, "Modelica", "Library", "python_interface")):
-    sys.exit("[ERROR] Python Interface was not found in given folder. Program will be aborted!")
-sys.path.insert(0, os.path.join(PATH_DYMOLA, r'Modelica\Library\python_interface\dymola.egg'))
 Aixlib_path = r"Modelica\AixLib\Aixlib"
 Output_path = os.path.join(r"Results\Teaser_Output")
-WPSmodel_path = r"D:\Remote-User\aku-fst\Hiwi\normativ-hps-design\Models\HPS_model\package.mo"  # path to HPS model
+WPSmodel_path = os.path.join(Path(__file__).parents[1], 'VCLib', 'HeatPumpFlowSheets', 'HPS_model') # path to HPS model
 
 if not os.path.exists(res_path):
     os.mkdir(res_path)
@@ -28,6 +25,9 @@ if not os.path.exists(res_path):
     os.mkdir(res_path + "/VDI")
     os.mkdir(res_path + "/Teaser_Output")
 
+if not os.path.exists(os.path.join(PATH_DYMOLA, "Modelica", "Library", "python_interface")):
+    sys.exit("[ERROR] Python Interface was not found in given folder. Program will be aborted!")
+sys.path.insert(0, os.path.join(PATH_DYMOLA, r'Modelica\Library\python_interface\dymola.egg'))
 from dymola.dymola_interface import DymolaInterface
 
 
@@ -48,7 +48,9 @@ def jahressim(model_path, model_name, result_path, initial_values,
         dymola.experimentSetupOutput(events=False)
         # Parameters to change
         initial_names = ['Q_flow_hp_biv', 'Q_flow_hr', 'v_buffer_sto',
-                         'v_dhw_sto']
+                         'v_dhw_sto', 'filename_T_amb', 'filename_Qdem', 'filename_DHW']
+        initial_values = initial_values + ['Functions_GUI/matFiles/ambTemp.mat', 'Functions_GUI/matFiles/DHW.mat',
+                                           'Functions_GUI/matFiles/heat.mat']
         dymola.simulateExtendedModel(
             problem=model_name,
             startTime=0.0,
@@ -259,7 +261,6 @@ def path_mat(config_name, ambtemp=True, dhw=True, heat=True, ind=False):
     # heat demand
     if heat and not ind:
         dummy = teasersim(config_name, data['wetterdaten'], create_heat_mat=True)[1]
-        # TODO: konstante mat file erzeugen
 
 
 def open_config(config_name):
@@ -418,7 +419,7 @@ def calc_points(config_name, dict_norm, name, ind=False):
 
         # simulation of WPS
         initial_values = [q_flow_hp_biv, q_flow_hr, v_buffer_sto, v_dhw_sto]  # parameters changed in Simulation
-        model_name = 'HPS_model.Components.new.SystemsFMU.System_MapOneHeatpump_v2'
+        model_name = 'VCLib.HeatPumpFlowSheets.HPS_model.System_MapOneHeatpump'
         result_path = os.path.join(res_path, name)
         os.makedirs(result_path, exist_ok=True)
         sim_res_path = jahressim(WPSmodel_path, model_name, result_path, initial_values, stoptime=32400000)
@@ -455,7 +456,7 @@ def calc_js(config_name, dict_norm, name, ind=False):
     q_flow_hr = dict_norm['Q_HS_AP'] * 1000
     path_mat(config_name, ind=ind)  # paths changed in Simulation
     initial_values = [q_flow_hp_biv, q_flow_hr, v_buffer_sto, v_dhw_sto]  # parameters changed in Simulation
-    model_name = 'HPS_model.Components.new.SystemsFMU.System_MapOneHeatpump_v2'
+    model_name = 'VCLib.HeatPumpFlowSheets.HPS_model.System_MapOneHeatpump'
     result_path = os.path.join(res_path, name)
     os.makedirs(result_path, exist_ok=True)
     sim_res_path = jahressim(WPSmodel_path, model_name, result_path, initial_values, stoptime=32400000)

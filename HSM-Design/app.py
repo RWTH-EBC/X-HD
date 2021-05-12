@@ -854,7 +854,6 @@ app.layout = html.Div(style={'backgroundColor': colors['white']}, children=[
 
     ]),
 
-    # TODO: graph
     html.Div(id='plots', style={'display': 'none'}, children=[
 
         # DIN results
