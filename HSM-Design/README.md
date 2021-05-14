@@ -20,6 +20,6 @@ In the file Functions_GUI/Functions.py you have to update the paths to Dymola (l
 There are two different GUIs implemented. One is a local GUI generated with PyQt5, the other is a WebApp created with Dash. To run these, change to the directory where `GUI_NormativeDesign.py` and `app.py` are located. To start the local GUI run `python GUI_NormativeDesign.py`. For the WebApp run `python app.py` and press the link in the output.
 
 Currently, the final design is printed to command line.
-This repository is still in developement, so minor bugs may occur.
+Since this repository is still in development, minor bugs may occur. If errors occur, please consider restarting the app.
 
 

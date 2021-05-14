@@ -11,12 +11,12 @@ from pathlib import Path
 # paths
 # TODO: ask for paths in app once
 PATH_DYMOLA = r"C:\Program Files\Dymola 2021"
-comp_path = r"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC"
+comp_path = r"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build"
 
 res_path = os.path.join(Path(__file__).parents[1], 'Results')
-Aixlib_path = r"Modelica\AixLib\Aixlib"
-Output_path = os.path.join(r"Results\Teaser_Output")
-WPSmodel_path = os.path.join(Path(__file__).parents[1], 'VCLib', 'HeatPumpFlowSheets', 'HPS_model') # path to HPS model
+Aixlib_path = os.path.join(Path(__file__).parents[1], 'Modelica', 'AixLib', 'Aixlib')
+Output_path = os.path.join(Path(__file__).parents[1], 'Results', 'Teaser_Output')
+WPSmodel_path = os.path.join(Path(__file__).parents[2], 'VCLib', 'HeatPumpFlowSheets', 'HPS_model')  # path to HPS model
 
 if not os.path.exists(res_path):
     os.mkdir(res_path)
@@ -151,7 +151,7 @@ def teasersim(config_name, weatherdatakreis=None, create_heat_mat=False):
 
     # evaluation and analysis
     finally:
-        dymola.close()
+        # dymola.close()
 
         os.chdir(w_path)
         jahr_auswertung = 240  # 2 days of initialization
@@ -167,10 +167,7 @@ def teasersim(config_name, weatherdatakreis=None, create_heat_mat=False):
                 mat_list.append([time_list[i], dmf_d[i]])
             mat = np.array(mat_list)
             path_heat = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'matFiles\heat.mat')
-            path_heat_dymola = os.path.join(Path(__file__).parents[1], 'Models', 'HPS_model', 'Components', 'new',
-                                            'Data', 'heat.mat')
             savemat(path_heat, {'Q_dem': mat})
-            savemat(path_heat_dymola, {'Q_dem': mat})
         while jahr_auswertung < dmf.size('multizone.PHeater[1]'):
             sum_jahr += dmf_d[jahr_auswertung]
             jahr_auswertung += 1
@@ -234,30 +231,21 @@ def path_mat(config_name, ambtemp=True, dhw=True, heat=True, ind=False):
             mat_list.append([time_list[i], ambtemp_list[i]])
         mat = np.array(mat_list)
         path_temp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matFiles\\ambTemp.mat')
-        path_temp_dymola = os.path.join(Path(__file__).parents[1], 'Models', 'HPS_model', 'Components', 'new',
-                                        'Data', 'ambTemp.mat')
         savemat(path_temp, {'T_amb': mat})
-        savemat(path_temp_dymola, {'T_amb': mat})
     # DHW
     if dhw:
         if data['profil'] == 'einzelperson':
             x = loadmat(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                      'matFiles\\profilesDHW\\Einzelperson.mat'))['DHW']
             savemat(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matFiles\\DHW.mat'), {'DHW': x})
-            savemat(os.path.join(Path(__file__).parents[1], 'Models', 'HPS_model', 'Components', 'new', 'Data',
-                                 'DHW.mat'), {'DHW': x})
         if data['profil'] == 'familie_duschen':
             x = loadmat(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                      'matFiles\\profilesDHW\\Familie mit Duschen.mat'))['DHW']
             savemat(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matFiles\\DHW.mat'), {'DHW': x})
-            savemat(os.path.join(Path(__file__).parents[1], 'Models', 'HPS_model', 'Components', 'new', 'Data',
-                                 'DHW.mat'), {'DHW': x})
         if data['profil'] == 'familie_duschen_baden':
             x = loadmat(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                      'matFiles\\profilesDHW\\Familie mit Duschen und Baden.mat'))['DHW']
             savemat(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matFiles\\DHW.mat'), {'DHW': x})
-            savemat(os.path.join(Path(__file__).parents[1], 'Models', 'HPS_model', 'Components', 'new', 'Data',
-                                 'DHW.mat'), {'DHW': x})
     # heat demand
     if heat and not ind:
         dummy = teasersim(config_name, data['wetterdaten'], create_heat_mat=True)[1]

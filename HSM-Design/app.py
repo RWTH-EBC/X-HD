@@ -35,6 +35,9 @@ df_res_ind = pd.DataFrame(columns=columns)
 # error to check, if all necessary data was given
 fill_error = True
 
+# button enabler
+button_disabler = True
+
 # counter for button clicks
 click_counter = 0
 
@@ -1335,26 +1338,28 @@ def update_config_vditab(circ, circ_temp, fac_storage, num_unit, dem_con, bl_per
 # disable button while calculation is performed
 @app.callback(
     [Output('start', 'disabled'), Output('run-message', 'children')],
-    [Input('start', 'n_clicks'), Input('trigger', 'children'), Input('error', 'children')])
-def disable_button(clicked, trigger, error):
-    context = [d['prop_id'] for d in dash.callback_context.triggered]
-    print(context)
-    context = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
-    # if the button triggered the function and button was pressed once already
-    print(context)
-    if 'start.n_clicks' in context and clicked is not None:
-        if clicked > 0:
-            return True, 'Calculation is running...'
-    if 'trigger.children' in context:
-        time.sleep(3)
-        return False, ''
+    [Input('start', 'n_clicks'), Input('trigger', 'children')])
+def disable_button(clicked, trigger):
+    global button_disabler
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    if 'start.n_clicks' in changed_id and button_disabler:
+        button_disabler = False
+        return True, 'Calculation is running...'
     else:
+        button_disabler = True
         return False, ''
+
+# function to forward trigger information to disable_button
+@app.callback(
+    Output('trigger', 'children'),
+    [Input('plots', 'style')])
+def forward(clicked):
+    return 1
 
 
 # start calculation after button is pressed
 @app.callback(
-    [Output('error', 'children'), Output('trigger', 'children'), Output('plots', 'style')],
+    [Output('error', 'children'), Output('plots', 'style')],
     [Input('start', 'n_clicks'), Input('demand-calc', 'value'), Input('check-calc', 'value'),
      Input('check-weather', 'value'), Input('yearsim', 'value'), Input('design-year', 'value'),
      Input('scop', 'value'), Input('design-scop', 'value'), Input('trigger', 'children')])
@@ -1363,6 +1368,7 @@ def start_calculation(clicked, teaser, calc, weather, year, design_year, scop, d
     global df_res_vdi
     global df_res_ind
     global click_counter
+    global button_disabler
     if clicked is not None and clicked > click_counter:
         # counter, so that code is only running if button is clicked
         click_counter = click_counter + 1
@@ -1388,7 +1394,8 @@ def start_calculation(clicked, teaser, calc, weather, year, design_year, scop, d
                     if 'VDI' in calc:
                         result_dict['dict_vdi'] = Func.calc_vdi(abs_config_path, q_biv, q_na)
             else:
-                return 'An error occurred. Please check if you filled all data in \"Building Data\" tab.', 1, \
+                button_disabler = True
+                return 'An error occurred. Please check if you filled all data in \"Building Data\" tab.',\
                        {'display': 'none'}
 
         else:
@@ -1412,8 +1419,9 @@ def start_calculation(clicked, teaser, calc, weather, year, design_year, scop, d
                     df_res_ind = desFunc.df_creator(result_dict['path_jahres_ind'])
                 yearplot = True
             else:
+                button_disabler = True
                 return 'It was no Design selected. Therefore a annual simulation was not possible. ' \
-                       'Please select a normative Design the next time.', 2, {'display': 'none'}
+                       'Please select a normative Design the next time.', {'display': 'none'}
         else:
             yearplot = False
 
@@ -1430,15 +1438,19 @@ def start_calculation(clicked, teaser, calc, weather, year, design_year, scop, d
                                                                       ind=True)
                     result_dict['scop_ind'] = Func.scop_norm(abs_config_path, result_dict['scop_ind_points'])
             else:
+                button_disabler = True
                 return 'It was no normative Design selected. Therefore a calculation of the COP was not possible. ' \
-                       'Please select a normative Design the next time.', 3, {'display': 'none'}
+                       'Please select a normative Design the next time.', {'display': 'none'}
         print(result_dict)
         if yearplot:
             print(result_dict)
-            return 'Calculation is Done. See the results below.', 4, {'display': 'block'}
+            button_disabler = True
+            return 'Calculation is Done. See the results below.', {'display': 'block'}
         else:
-            return 'Calculation is Done. See the results below.', 5, {'display': 'none'}
-    return '', 0, {'display': 'none'}
+            button_disabler = True
+            return 'Calculation is Done. See the results below.', {'display': 'none'}
+    button_disabler = True
+    return '', {'display': 'none'}
 
 
 def create_time_series(dff, axis_type, title):
@@ -1489,4 +1501,4 @@ def update_graph_vdi(y, time_slider_min, time_slider_max):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, threaded=True)
