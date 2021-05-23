@@ -55,7 +55,7 @@ package R744_I0_P10_100_T233_373_Horner "Refrigerant model for R744 using a hybr
       max=373.15),
     smoothModel=true,
     onePhase=false,
-    ThermoStates=Choices.IndependentVariables.phX,
+    ThermoStates=Modelica.Media.Interfaces.Choices.IndependentVariables.phX,
     fluidConstants=refrigerantConstants);
   /*The vector substanceNames is mandatory, as the number of
       substances is determined based on its size. Here we assume
