@@ -39,7 +39,7 @@ def jahressim(model_path, model_name, result_path, initial_values,
     q_flow_hr, v_buffer_sto, v_dhw_sto]. stoptime describes the simulation time. default is one year plus ten days
     for initialization. Returns the path to the result file."""
     dymola = DymolaInterface(dymolapath=os.path.join(PATH_DYMOLA, 'bin64', 'Dymola.exe'),
-                             showwindow=True)
+                             showwindow=False)
     try:
 
         dymola.openModel(path=os.path.join(Aixlib_path, 'package.mo'))
@@ -128,7 +128,7 @@ def teasersim(config_name, weatherdatakreis=None, create_heat_mat=False):
         path=Output_path)
 
     dymola = DymolaInterface(dymolapath=os.path.join(dymola_path, 'bin64', 'Dymola.exe'),
-                             showwindow=True)
+                             showwindow=False)
     try:
         dymola.openModel(path=os.path.join(Aixlib_path, 'package.mo'))
         dymola.experimentSetupOutput(events=False)
@@ -151,7 +151,7 @@ def teasersim(config_name, weatherdatakreis=None, create_heat_mat=False):
 
     # evaluation and analysis
     finally:
-        # dymola.close()
+        dymola.close()
 
         os.chdir(w_path)
         jahr_auswertung = 240  # 2 days of initialization
