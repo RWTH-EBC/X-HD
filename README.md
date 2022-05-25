@@ -40,6 +40,6 @@ Refrigeration Science and Technology,
 2020,
 http://dx.doi.org/10.18462/iir.gl.2020.106
 
-
+Vering, C., Engelpracht, M., Göbel, S., Hoseinpoori, S., Wüllhorst, F., Schwenzer, C., Rademacher, M., Hinrichs, S., Chandra, F., Mehrfeld, P., and Müller, D., Open-Source vapor compression library (VCLib): Heat pump modeling for education and research, Comput. Appl. Eng. Educ. (2022), 1– 12. https://doi.org/10.1002/cae.22540 
 
 
